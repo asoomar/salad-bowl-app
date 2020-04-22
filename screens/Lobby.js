@@ -8,49 +8,84 @@ class Lobby extends Component {
   state = {
     editWords: true,
     error: '',
-    players: [],
+    players: [['','']],
+    waitingPlayerKeys: [],
     words: [{key: '', word: ''}, {key: '', word: ''}],
     wordCount: 0,
-    // totalWordCount: 0,
   }
 
   componentDidMount() {
     this.db = Fire.db;
-    let myPlayerRef = this.db.getRef('players/' + this.props.gameID).push(this.props.screenName);
-    this.props.setPlayerID(myPlayerRef.key);
 
-    this.db.getRef('players/' + this.props.gameID).on('value', (snapshot) => {
-      let dbPlayers = _(snapshot.val()).values();
-      this.setState(prevState => {
-        return {
-          players: [...dbPlayers], 
-          // totalWordCount: Math.max([...dbPlayers].length*2, prevState.totalWordCount)
-        }
+    // Add player to the list of players for the game
+    this.db.getRef('players/' + this.props.gameID).push(this.props.screenName)
+      .then((value) => {
+        this.props.setPlayerID(value.key)
+        // Add player to 'waiting' state to indicate (to others) they haven't submitted words
+        this.db.getRef(`games/${this.props.gameID}/waiting/${value.key}`).set(this.props.screenName);
       });
+
+    // Listen for any players that have been added to the game  
+    this.db.getRef('players/' + this.props.gameID).on('value', (snapshot) => {
+      let dbPlayers = _.toPairs(snapshot.val());
+      this.setState({players: [...dbPlayers]});  
     });
     
+    // Listen for words submitted (used for count)
     this.db.getRef('words/' + this.props.gameID).on('value', (snapshot) => {
       let words = _(snapshot.val()).values();
       let count = [...words].length;
       this.setState({wordCount: count});
+    });
+
+    // Listen for players in 'waiting' state
+    this.db.getRef(`games/${this.props.gameID}/waiting`).on('value', (snapshot) => {
+      let waiting = _(snapshot.val()).keys();
+      this.setState({waitingPlayerKeys: [...waiting]});
     });
   }
 
   async componentWillUnmount() {
     this.db.getRef('players/' + this.props.gameID).off();
     this.db.getRef('words/' + this.props.gameID).off();
+    this.db.getRef(`games/${this.props.gameID}/waiting`).off();
   }
 
   async goHome() {
+    // Remove player from player list for game
     this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}`).remove()
     .then(()=> {
       console.log(`${this.props.playerID} (${this.props.screenName}) was removed from the game`);
+      this.removeUserWaiting();
+      this.removeUserWords();
       this.checkIfLastToLeave();
-      this.props.setPlayerID('');
-      this.props.updateGameID('');
     })
     .catch((error) => 'Remove failed: ' + error.message)
-    .finally(()=> this.props.changeScreen(Screens.HOME));
+    .finally(()=> {
+      this.props.setPlayerID('');
+      this.props.updateGameID('');
+      this.props.changeScreen(Screens.HOME)
+    });
+  }
+
+  async removeUserWaiting() {
+    this.db.getRef(`games/${this.props.gameID}/waiting/${this.props.playerID}`).remove()
+    .then(()=> {
+      console.log(`${this.props.playerID} (${this.props.screenName}) was removed from waiting`);
+    })
+    .catch((error) => 'Remove from waiting failed: ' + error.message)
+  }
+
+  // Remove the words the user submitted
+  async removeUserWords() {
+    let currentWords = this.state.words;
+    for (let i = 0; i < currentWords.length; i++) {
+      this.db.getRef(`words/${this.props.gameID}/${currentWords[i].key}`).remove()
+      .then(()=> {
+        console.log(`Removed word (${currentWords[i].word}) from game`);
+      })
+      .catch((error) => 'Word remove failed: ' + error.message)
+    }
   }
 
   // Check if we were the last person to leave the game
@@ -115,6 +150,9 @@ class Lobby extends Component {
           return {words: newWords};
         })
       }
+      this.db.getRef(`games/${this.props.gameID}/waiting/${this.props.playerID}`).remove()
+      .then(()=> 
+      console.log(`No longer waiting for ${this.props.playerID} (${this.props.screenName}) to submit words`))
     }
     this.setState({editWords: false});
     this.setState((prevState) => {
@@ -135,7 +173,8 @@ class Lobby extends Component {
 
   render() {
     let playerList = this.state.players.map((player, i)=>{
-        return(<Text key={i}>{player}</Text>);
+      let prefix = this.state.waitingPlayerKeys.includes(player[0]) ? '*' : '';
+      return(<Text key={i}>{prefix}{player[1]}</Text>);
     });
 
     let yourWords = this.state.editWords ? 
