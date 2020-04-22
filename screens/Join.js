@@ -40,12 +40,10 @@ class Join extends Component {
   pressSubmit() {
     let gameID = this.state.joinCode.toUpperCase();
     if (this.canUserJoinGame(gameID)) {
-      console.log('Looks like the user can join');
       this.props.updateName(this.state.name);
       this.props.updateGameID(gameID);
       this.props.changeScreen(Screens.LOBBY);
     }
-    console.log('Check complete and user couldnt join game'); 
   }
 
   render() {

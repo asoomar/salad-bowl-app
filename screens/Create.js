@@ -24,9 +24,10 @@ class Create extends Component {
       if (snapshot.val() == null) { // We want to make sure the game doesn't exist yet
         console.log(`Game ID (${id}) does not exist yet`)
         return false;
+      } else {
+        console.log(`Game id (${id}) already exists`); 
+        return true;
       }
-      console.log(`Game id (${id}) already exists`); 
-      return true;
     })
     .catch(error => {
       console.log(`Failed to check if game id ${id} is valid`);
