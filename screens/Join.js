@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
-import Lobby from './Lobby';
 
 class Join extends Component {
   state = {

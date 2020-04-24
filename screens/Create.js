@@ -60,6 +60,7 @@ class Create extends Component {
     gameRef.child(newGameID).set({ 
       'timestamp': Date.now(),
       'round': '',
+      'status': Screens.LOBBY,
       'currentPlayer': '',
       'turnStartTimestamp': ''})
     .then(() => {

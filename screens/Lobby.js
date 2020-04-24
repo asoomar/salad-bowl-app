@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, TouchableNativeFeedback } from 'react-native';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
 import _ from 'lodash';
@@ -43,12 +43,21 @@ class Lobby extends Component {
       let waiting = _(snapshot.val()).keys();
       this.setState({waitingPlayerKeys: [...waiting]});
     });
+
+    // Listen for game to start
+    this.db.getRef(`games/${this.props.gameID}/status`).on('value', (snapshot) => {
+      if (snapshot.val() === Screens.TEAMS) {
+        this.props.changeScreen(Screens.TEAMS);
+      }
+    });
+
   }
 
   async componentWillUnmount() {
-    this.db.getRef('players/' + this.props.gameID).off();
-    this.db.getRef('words/' + this.props.gameID).off();
+    this.db.getRef(`players/${this.props.gameID}`).off();
+    this.db.getRef(`words/${this.props.gameID}`).off();
     this.db.getRef(`games/${this.props.gameID}/waiting`).off();
+    this.db.getRef(`games/${this.props.gameID}/status`).off();
   }
 
   async goHome() {
@@ -168,7 +177,25 @@ class Lobby extends Component {
   }
 
   startGame() {
-
+    this.db.getRef(`games/${this.props.gameID}/status`).set(Screens.TEAMS)
+    .then(() => {
+      console.log(`Setting up teams for game ${this.props.gameID}`);
+      this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
+        let gamePlayers = Object.entries(snapshot.val());
+        gamePlayers.sort(() => Math.random() - 0.5);
+        let playersWithTeams = {};
+        for (let i = 0; i < gamePlayers.length; i++) {
+          let teamNumber = i % 2 === 0 ? 0 : 1;
+          let playerObject = {
+            name: gamePlayers[i][1],
+            team: teamNumber
+          }
+          playersWithTeams[gamePlayers[i][0]] = playerObject;
+        }
+        this.db.getRef(`players/${this.props.gameID}`).update(playersWithTeams);
+      });
+    })
+    .catch((error) => console.log(`There was an error starting the game ${this.props.GameID}`))
   }
 
   render() {
