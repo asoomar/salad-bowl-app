@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, TouchableNativeFeedback } from 'react-native';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
 import _ from 'lodash';
@@ -43,12 +43,21 @@ class Lobby extends Component {
       let waiting = _(snapshot.val()).keys();
       this.setState({waitingPlayerKeys: [...waiting]});
     });
+
+    // Listen for game to start
+    this.db.getRef(`games/${this.props.gameID}/status`).on('value', (snapshot) => {
+      if (snapshot.val() === Screens.TEAMS) {
+        this.props.changeScreen(Screens.TEAMS);
+      }
+    });
+
   }
 
   async componentWillUnmount() {
-    this.db.getRef('players/' + this.props.gameID).off();
-    this.db.getRef('words/' + this.props.gameID).off();
+    this.db.getRef(`players/${this.props.gameID}`).off();
+    this.db.getRef(`words/${this.props.gameID}`).off();
     this.db.getRef(`games/${this.props.gameID}/waiting`).off();
+    this.db.getRef(`games/${this.props.gameID}/status`).off();
   }
 
   async goHome() {
@@ -135,15 +144,18 @@ class Lobby extends Component {
     this.setState({error: ''});
     if (this.state.words[0].key !== '') { // Update words in database
       for (let i = 0; i < this.state.words.length; i++) {
-        this.db.getRef(`words/${this.props.gameID}`)
+        this.db.getRef(`words/${this.props.gameID}/${this.state.words[i].key}`)
         .update({
-          [this.state.words[i].key]: this.state.words[i].word.trim().toUpperCase()
+          word: this.state.words[i].word.trim().toUpperCase()
         });
       }
     } else { // Add words to database
       let gameWordsRef = this.db.getRef('words/' + this.props.gameID);
       for (let i = 0; i < this.state.words.length; i++) {
-        let wordRef = gameWordsRef.push(this.state.words[i].word.trim().toUpperCase());
+        let wordRef = gameWordsRef.push({
+          word: this.state.words[i].word.trim().toUpperCase(),
+          hasBeenPlayed: false
+        });
         this.setState(prevState => {
           let newWords = [...prevState.words];
           newWords[i].key = wordRef.key;
@@ -168,7 +180,26 @@ class Lobby extends Component {
   }
 
   startGame() {
-
+    this.db.getRef(`games/${this.props.gameID}/status`).set(Screens.TEAMS)
+    .then(() => {
+      console.log(`Setting up teams for game ${this.props.gameID}`);
+      this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
+        let gamePlayers = Object.entries(snapshot.val());
+        gamePlayers.sort(() => Math.random() - 0.5);
+        let playersWithTeams = {};
+        for (let i = 0; i < gamePlayers.length; i++) {
+          let teamNumber = i % 2 === 0 ? 0 : 1;
+          let playerObject = {
+            name: gamePlayers[i][1],
+            team: teamNumber,
+            hasPlayed: false
+          }
+          playersWithTeams[gamePlayers[i][0]] = playerObject;
+        }
+        this.db.getRef(`players/${this.props.gameID}`).update(playersWithTeams);
+      });
+    })
+    .catch((error) => console.log(`There was an error starting the game ${this.props.GameID}`))
   }
 
   render() {
@@ -209,8 +240,8 @@ class Lobby extends Component {
 
     return (
       <View style={styles.container}>
-        <Text>Lobby Game Screen</Text> 
-        <Text>Game ID: {this.props.gameID}</Text> 
+        <Text style={styles.heading}>Lobby Game Screen</Text> 
+        <Text style={styles.heading}>Game ID: {this.props.gameID}</Text> 
         {yourWords}
         {/* Note that currently it is possible for the submitted word count
         to be greater than the total word count that needs to be hit */}
@@ -220,7 +251,7 @@ class Lobby extends Component {
           disabled={this.state.wordCount < this.state.players.length*2}
           onPress={()=>this.startGame()}
         />
-        <Text>Players</Text>
+        <Text style={styles.heading}>Players</Text>
         {playerList}
         <Button title="Leave" onPress={()=>this.goHome()}/> 
       </View>
@@ -234,6 +265,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  heading: {
+    fontWeight: 'bold'
   },
   textInput: {
     borderColor: 'gray',

@@ -5,6 +5,7 @@ import Home from './screens/Home';
 import Create from './screens/Create';
 import Join from './screens/Join';
 import Lobby from './screens/Lobby';
+import Teams from './screens/Teams';
 
 //ADD CODE SO THAT ON ANY DATABASE ACCESS ERROR, EVERYTHING IS SET TO DEFAULT
 //AND THE USER IS DIRECTED BACK TO THE HOME SCREEN
@@ -16,6 +17,7 @@ export default function App() {
   const [name, setName] = useState('');
   const [playerID, setPlayerID] = useState('');
   const [gameID, setGameID] = useState('');
+  const [team, setTeam] = useState(-1);
 
   //CHECK TO SEE WHAT THE PLAYERID IS TO SEE IF WE SHOULD CONTINUE WITH THE LAST GAME
   return (
@@ -55,6 +57,18 @@ export default function App() {
           playerID={playerID}
           screenName={name}/> 
         : null}
+
+      {/* TEAMS SCREEN */}
+      {currentScreen === Screens.TEAMS ? 
+        <Teams
+        changeScreen={(screen) => setCurrentScreen(screen)}
+        setPlayerID={(id) => setPlayerID(id)}
+        updateGameID={(id) => setGameID(id)}
+        updateTeam={(team) => setTeam(team)}
+        gameID={gameID}
+        playerID={playerID}
+        screenName={name}/> 
+      : null}
 
     </View>
   );
