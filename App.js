@@ -17,6 +17,7 @@ export default function App() {
   const [name, setName] = useState('');
   const [playerID, setPlayerID] = useState('');
   const [gameID, setGameID] = useState('');
+  const [team, setTeam] = useState(-1);
 
   //CHECK TO SEE WHAT THE PLAYERID IS TO SEE IF WE SHOULD CONTINUE WITH THE LAST GAME
   return (
@@ -62,7 +63,8 @@ export default function App() {
         <Teams
         changeScreen={(screen) => setCurrentScreen(screen)}
         setPlayerID={(id) => setPlayerID(id)}
-        updateGameID={(id)=>setGameID(id)}
+        updateGameID={(id) => setGameID(id)}
+        updateTeam={(team) => setTeam(team)}
         gameID={gameID}
         playerID={playerID}
         screenName={name}/> 

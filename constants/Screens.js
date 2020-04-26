@@ -4,7 +4,9 @@ const Screens = {
     JOIN: 'join',
     CREATE: 'create',
     LOBBY: 'lobby',
-    TEAMS: 'teams'
+    TEAMS: 'teams',
+    GAME: 'game',
+    FINISH: 'finish'
 }
 
 export default Screens;

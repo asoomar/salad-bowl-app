@@ -144,15 +144,18 @@ class Lobby extends Component {
     this.setState({error: ''});
     if (this.state.words[0].key !== '') { // Update words in database
       for (let i = 0; i < this.state.words.length; i++) {
-        this.db.getRef(`words/${this.props.gameID}`)
+        this.db.getRef(`words/${this.props.gameID}/${this.state.words[i].key}`)
         .update({
-          [this.state.words[i].key]: this.state.words[i].word.trim().toUpperCase()
+          word: this.state.words[i].word.trim().toUpperCase()
         });
       }
     } else { // Add words to database
       let gameWordsRef = this.db.getRef('words/' + this.props.gameID);
       for (let i = 0; i < this.state.words.length; i++) {
-        let wordRef = gameWordsRef.push(this.state.words[i].word.trim().toUpperCase());
+        let wordRef = gameWordsRef.push({
+          word: this.state.words[i].word.trim().toUpperCase(),
+          hasBeenPlayed: false
+        });
         this.setState(prevState => {
           let newWords = [...prevState.words];
           newWords[i].key = wordRef.key;
@@ -188,7 +191,8 @@ class Lobby extends Component {
           let teamNumber = i % 2 === 0 ? 0 : 1;
           let playerObject = {
             name: gamePlayers[i][1],
-            team: teamNumber
+            team: teamNumber,
+            hasPlayed: false
           }
           playersWithTeams[gamePlayers[i][0]] = playerObject;
         }
@@ -236,8 +240,8 @@ class Lobby extends Component {
 
     return (
       <View style={styles.container}>
-        <Text>Lobby Game Screen</Text> 
-        <Text>Game ID: {this.props.gameID}</Text> 
+        <Text style={styles.heading}>Lobby Game Screen</Text> 
+        <Text style={styles.heading}>Game ID: {this.props.gameID}</Text> 
         {yourWords}
         {/* Note that currently it is possible for the submitted word count
         to be greater than the total word count that needs to be hit */}
@@ -247,7 +251,7 @@ class Lobby extends Component {
           disabled={this.state.wordCount < this.state.players.length*2}
           onPress={()=>this.startGame()}
         />
-        <Text>Players</Text>
+        <Text style={styles.heading}>Players</Text>
         {playerList}
         <Button title="Leave" onPress={()=>this.goHome()}/> 
       </View>
@@ -261,6 +265,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  heading: {
+    fontWeight: 'bold'
   },
   textInput: {
     borderColor: 'gray',
