@@ -6,6 +6,7 @@ import Create from './screens/Create';
 import Join from './screens/Join';
 import Lobby from './screens/Lobby';
 import Teams from './screens/Teams';
+import Game from './screens/Game';
 
 //ADD CODE SO THAT ON ANY DATABASE ACCESS ERROR, EVERYTHING IS SET TO DEFAULT
 //AND THE USER IS DIRECTED BACK TO THE HOME SCREEN
@@ -68,6 +69,16 @@ export default function App() {
         gameID={gameID}
         playerID={playerID}
         screenName={name}/> 
+      : null}
+
+      {/* GAME SCREEN */}
+      {currentScreen === Screens.GAME ? 
+        <Game
+        changeScreen={(screen) => setCurrentScreen(screen)}
+        gameID={gameID}
+        playerID={playerID}
+        screenName={name}
+        team={team}/> 
       : null}
 
     </View>

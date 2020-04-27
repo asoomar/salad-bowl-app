@@ -62,7 +62,10 @@ class Create extends Component {
       'round': '',
       'status': Screens.LOBBY,
       'currentPlayer': '',
-      'turnStartTimestamp': ''})
+      'turnStartTimestamp': '',
+      'score': {'team1': 0, 'team2': 0},
+      'turnTime': 60000
+    })
     .then(() => {
       console.log(`Game created. ID: ${newGameID}`);
       this.props.updateName(this.state.name);
