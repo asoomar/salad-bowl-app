@@ -29,10 +29,18 @@ class Teams extends Component {
       }
       this.setState({team1: team1Players, team2: team2Players});  
     });
+
+    // Listen for game to start
+    this.db.getRef(`games/${this.props.gameID}/status`).on('value', (snapshot) => {
+      if (snapshot.val() === Screens.GAME) {
+        this.props.changeScreen(Screens.GAME);
+      }
+    });
   }
 
   componentWillUnmount() {
     this.db.getRef(`players/${this.props.gameID}`).off();
+    this.db.getRef(`games/${this.props.gameID}/status`).off();
   }
 
   getTeam(teamName) {
