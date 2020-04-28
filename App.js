@@ -7,6 +7,7 @@ import Join from './screens/Join';
 import Lobby from './screens/Lobby';
 import Teams from './screens/Teams';
 import Game from './screens/Game';
+import Finish from './screens/Finish';
 
 //ADD CODE SO THAT ON ANY DATABASE ACCESS ERROR, EVERYTHING IS SET TO DEFAULT
 //AND THE USER IS DIRECTED BACK TO THE HOME SCREEN
@@ -28,7 +29,11 @@ export default function App() {
       {currentScreen === Screens.HOME ? 
         <Home 
           changeScreen={(screen) => setCurrentScreen(screen)}
-          playerID={playerID}/> 
+          setPlayerID={(id) => setPlayerID(id)}
+          updateName={(joinName) => setName(joinName)}
+          updateGameID={(id)=>setGameID(id)}
+          updateTeam={(team) => setTeam(team)}
+        /> 
         : null}
       
       {/* JOIN SCREEN */}
@@ -74,6 +79,16 @@ export default function App() {
       {/* GAME SCREEN */}
       {currentScreen === Screens.GAME ? 
         <Game
+        changeScreen={(screen) => setCurrentScreen(screen)}
+        gameID={gameID}
+        playerID={playerID}
+        screenName={name}
+        team={team}/> 
+      : null}
+
+      {/* FINISH SCREEN */}
+      {currentScreen === Screens.FINISH ? 
+        <Finish
         changeScreen={(screen) => setCurrentScreen(screen)}
         gameID={gameID}
         playerID={playerID}

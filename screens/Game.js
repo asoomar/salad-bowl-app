@@ -83,6 +83,13 @@ class Game extends Component {
       let turnTimeState = snapshot.val();
       this.setState({turnTime: turnTimeState});
     });
+
+    // Listen for game to finish
+    this.db.getRef(`games/${this.props.gameID}/status`).on('value', (snapshot) => {
+      if (snapshot.val() === Screens.FINISH) {
+        this.props.changeScreen(Screens.FINISH);
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -91,6 +98,7 @@ class Game extends Component {
     this.db.getRef(`games/${this.props.gameID}/round`).off();
     this.db.getRef(`games/${this.props.gameID}/turnStartTimestamp`).off();
     this.db.getRef(`games/${this.props.gameID}/turnTime`).off();
+    this.db.getRef(`games/${this.props.gameID}/status`).off();
     clearInterval(this.myInterval);
   }
 
@@ -134,7 +142,7 @@ class Game extends Component {
       turnStartTimestamp: ''
     })
     if (this.state.round === 3) {
-      this.db.getRef(`games/${this.props.gameID}/status`).set(Screens.FINISH)
+      this.db.getRef(`games/${this.props.gameID}/status`).set(Screens.FINISH);
     } else {
       // Get all words and set hasBeenPlayed to false
       this.db.getRef(`games/${this.props.gameID}/round`).set(this.state.round+1);

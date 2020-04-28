@@ -3,6 +3,11 @@ import { StyleSheet, Text, View, Button, TextInput, ShadowPropTypesIOS } from 'r
 import Screens from '../constants/Screens';
 
 export default function Home(props) {
+    props.setPlayerID('');
+    props.updateName('');
+    props.updateGameID('');
+    props.updateTeam(-1);
+
     return (
       <View style={styles.container}>
         <Button title="Create Game" onPress={()=>props.changeScreen(Screens.CREATE)}/> 

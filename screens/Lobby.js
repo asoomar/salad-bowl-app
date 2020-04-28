@@ -71,8 +71,6 @@ class Lobby extends Component {
     })
     .catch((error) => 'Remove failed: ' + error.message)
     .finally(()=> {
-      this.props.setPlayerID('');
-      this.props.updateGameID('');
       this.props.changeScreen(Screens.HOME)
     });
   }
