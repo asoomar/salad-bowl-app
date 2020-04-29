@@ -48,6 +48,7 @@ export default function App() {
       {currentScreen === Screens.CREATE ? 
         <Create 
           changeScreen={(screen) => setCurrentScreen(screen)}
+          setPlayerID={(id) => setPlayerID(id)}
           updateGameID={(id)=>setGameID(id)}
           updateName={(joinName) => setName(joinName)}
           gameID={gameID}/> 

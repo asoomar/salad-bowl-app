@@ -68,9 +68,17 @@ class Create extends Component {
     })
     .then(() => {
       console.log(`Game created. ID: ${newGameID}`);
-      this.props.updateName(this.state.name);
-      this.props.updateGameID(newGameID);
-      this.props.changeScreen(Screens.LOBBY);
+      // Add host to game
+      this.db.getRef(`players/${newGameID}`).push(this.state.name)
+      .then((value) => {
+        this.props.setPlayerID(value.key)
+        // Add player to 'waiting' state to indicate (to others) they haven't submitted words
+        this.db.getRef(`games/${newGameID}/waiting/${value.key}`).set(this.state.name);
+        this.db.getRef(`games/${newGameID}/host`).set({[value.key]: this.state.name});
+        this.props.updateName(this.state.name);
+        this.props.updateGameID(newGameID);
+        this.props.changeScreen(Screens.LOBBY);
+      });
     })
     .catch((error) => console.log('Game creation failed: ' + error.message));
   }

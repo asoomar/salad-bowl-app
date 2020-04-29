@@ -5,6 +5,7 @@ import Fire from '../Fire';
 
 class Teams extends Component {
   state = {
+    host: {name: null, id: null},
     team1: [],
     team2: []
   }
@@ -35,6 +36,12 @@ class Teams extends Component {
       if (snapshot.val() === Screens.GAME) {
         this.props.changeScreen(Screens.GAME);
       }
+    });
+
+    //Listen for Host change
+    this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
+      let host = Object.entries(snapshot.val())[0];
+      this.setState({host: {name: host[1], id: host[0]}});
     });
   }
 
@@ -81,7 +88,10 @@ class Teams extends Component {
         {teamOne}
         <Text style={[styles.heading, styles.red]}>Team 2</Text> 
         {teamTwo}
-        <Button title="Start" onPress={()=>this.startGame()}/> 
+        {this.props.playerID === this.state.host.id ? 
+        <Button title="Start" onPress={()=>this.startGame()}/> :
+        <Text>Waiting on the host to start the game</Text>
+        }
       </View>
     );
   }

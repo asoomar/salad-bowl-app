@@ -46,7 +46,7 @@ class Finish extends Component {
       loading = true;
     }
 
-    let message = "There was a Tie!";
+    let message = "It's a Tie!";
     if ((this.props.team === 0 && team1Score > team2Score) ||
      (this.props.team === 1 && team2Score > team1Score)) {
       message = "Your Team Won!"

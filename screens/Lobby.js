@@ -8,6 +8,7 @@ class Lobby extends Component {
   state = {
     editWords: true,
     error: '',
+    host: {name: null, id: null},
     players: [['','']],
     waitingPlayerKeys: [],
     words: [{key: '', word: ''}, {key: '', word: ''}],
@@ -17,13 +18,21 @@ class Lobby extends Component {
   componentDidMount() {
     this.db = Fire.db;
 
-    // Add player to the list of players for the game
-    this.db.getRef('players/' + this.props.gameID).push(this.props.screenName)
-      .then((value) => {
-        this.props.setPlayerID(value.key)
-        // Add player to 'waiting' state to indicate (to others) they haven't submitted words
-        this.db.getRef(`games/${this.props.gameID}/waiting/${value.key}`).set(this.props.screenName);
-      });
+    if (this.props.playerID === '') { //If host was already added, don't add again
+      // Add player to the list of players for the game
+      this.db.getRef('players/' + this.props.gameID).push(this.props.screenName)
+        .then((value) => {
+          this.props.setPlayerID(value.key)
+          // Add player to 'waiting' state to indicate (to others) they haven't submitted words
+          this.db.getRef(`games/${this.props.gameID}/waiting/${value.key}`).set(this.props.screenName);
+        });
+    }
+
+    //Listen for Host change
+    this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
+      let host = Object.entries(snapshot.val())[0];
+      this.setState({host: {name: host[1], id: host[0]}});
+    });
 
     // Listen for any players that have been added to the game  
     this.db.getRef('players/' + this.props.gameID).on('value', (snapshot) => {
@@ -58,6 +67,7 @@ class Lobby extends Component {
     this.db.getRef(`words/${this.props.gameID}`).off();
     this.db.getRef(`games/${this.props.gameID}/waiting`).off();
     this.db.getRef(`games/${this.props.gameID}/status`).off();
+    this.db.getRef(`games/${this.props.gameID}/host`).off();
   }
 
   async goHome() {
@@ -241,14 +251,13 @@ class Lobby extends Component {
         <Text style={styles.heading}>Lobby Game Screen</Text> 
         <Text style={styles.heading}>Game ID: {this.props.gameID}</Text> 
         {yourWords}
-        {/* Note that currently it is possible for the submitted word count
-        to be greater than the total word count that needs to be hit */}
         <Text>{this.state.wordCount}/{this.state.players.length*2} words submitted</Text>
+        {this.props.playerID === this.state.host.id ?
         <Button 
           title="Start Game!" 
           disabled={this.state.wordCount < this.state.players.length*2}
           onPress={()=>this.startGame()}
-        />
+        /> : <Text>Only the host can start the game</Text>}
         <Text style={styles.heading}>Players</Text>
         {playerList}
         <Button title="Leave" onPress={()=>this.goHome()}/> 
