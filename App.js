@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, View, SafeAreaView } from 'react-native';
+import * as Font from 'expo-font';
+import { AppLoading } from 'expo';
 import Screens from './constants/Screens';
 import Home from './screens/Home';
 import Create from './screens/Create';
@@ -8,6 +10,13 @@ import Lobby from './screens/Lobby';
 import Teams from './screens/Teams';
 import Game from './screens/Game';
 import Finish from './screens/Finish';
+
+const fetchFonts = () => {
+  Font.loadAsync({
+    'poppins-regular': require('./assets/fonts/poppins/Poppins-Regular.ttf'),
+    'poppins-semibold': require('./assets/fonts/poppins/Poppins-SemiBold.ttf'),
+  });
+}
 
 //ADD CODE SO THAT ON ANY DATABASE ACCESS ERROR, EVERYTHING IS SET TO DEFAULT
 //AND THE USER IS DIRECTED BACK TO THE HOME SCREEN
@@ -21,9 +30,20 @@ export default function App() {
   const [gameID, setGameID] = useState('');
   const [team, setTeam] = useState(-1);
 
+  const [dataLoaded, setDataLoaded] = useState(false);
+  //Fetch fonts
+  if (!dataLoaded) {
+    return (
+      <AppLoading 
+        startAsync={fetchFonts} 
+        onFinish={() => setDataLoaded(true)}
+        onFail={() => console.log('Failed to load app assets...')}/>
+    )
+  }
+
   //CHECK TO SEE WHAT THE PLAYERID IS TO SEE IF WE SHOULD CONTINUE WITH THE LAST GAME
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
 
       {/* HOME SCREEN */}
       {currentScreen === Screens.HOME ? 
@@ -97,14 +117,14 @@ export default function App() {
         team={team}/> 
       : null}
 
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#eeeeee',
     alignItems: 'center',
     justifyContent: 'center',
   },
