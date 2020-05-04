@@ -11,10 +11,11 @@ import Teams from './screens/Teams';
 import Game from './screens/Game';
 import Finish from './screens/Finish';
 
-const fetchFonts = () => {
-  Font.loadAsync({
+const fetchFonts = async () => {
+  await Font.loadAsync({
     'poppins-regular': require('./assets/fonts/poppins/Poppins-Regular.ttf'),
     'poppins-semibold': require('./assets/fonts/poppins/Poppins-SemiBold.ttf'),
+    'poppins-extrabold': require('./assets/fonts/poppins/Poppins-ExtraBold.ttf'),
   });
 }
 
@@ -124,7 +125,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eeeeee',
+    backgroundColor: '#4b42f5',
     alignItems: 'center',
     justifyContent: 'center',
   },

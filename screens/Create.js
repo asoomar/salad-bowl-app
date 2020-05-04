@@ -1,5 +1,13 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput, Keyboard } from 'react-native';
+import { 
+  StyleSheet, 
+  Text, 
+  View,  
+  Dimensions, 
+  Keyboard} from 'react-native';
+import PrimaryTextInput from '../components/primitives/PrimaryTextInput';
+import PrimaryButton from '../components/primitives/PrimaryButton';
+import BackButton from '../components/primitives/BackButton';
 import rand from 'random-seed';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
@@ -86,18 +94,26 @@ class Create extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Create Game Screen</Text>
-        <Text>{this.state.error}</Text>
-        <TextInput 
-        style={styles.textInput}
-        autoCompleteType={"off"}
-        autoCorrect={false}
-        onChangeText={text=>this.updateName(text)}
-        placeholder={"Enter Name"}
-        value={this.state.name}
-        />
-        <Button title="Submit" onPress={()=>this.pressSubmit()}/> 
-        <Button title="Back" onPress={()=>this.props.changeScreen(Screens.HOME)}/> 
+        <View style={styles.mainView}>
+          <Text style={styles.title}>Create Game</Text>
+          <Text>{this.state.error}</Text>
+          <PrimaryTextInput 
+            autoCorrect={false}
+            onChangeText={text=>this.updateName(text)}
+            placeholder={'Your Name'}
+            value={this.state.name}
+          />
+          <PrimaryButton
+            text={'Create'}
+            onPress={()=>this.pressSubmit()}
+          />
+        </View>
+        <View style={styles.backButtonView}>
+          <BackButton 
+            onPress={()=>this.props.changeScreen(Screens.HOME)}
+            margin={Dimensions.get('screen').width/15}
+          />
+        </View>
       </View>
     );
   }
@@ -106,18 +122,28 @@ class Create extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  textInput: {
-    borderColor: 'gray',
-    borderRadius: 10,
-    borderWidth: 1,
-    height: 40,
-    margin: 5,
-    padding: 4,
-    width: 200
+  mainView: {
+    flex: 3,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: Dimensions.get('screen').height/20,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    marginBottom: 10,
+  },
+  backButtonView: {
+    flex: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   }
 });
 

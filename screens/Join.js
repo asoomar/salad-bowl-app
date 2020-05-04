@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, Dimensions } from 'react-native';
+import PrimaryTextInput from '../components/primitives/PrimaryTextInput';
+import PrimaryButton from '../components/primitives/PrimaryButton';
+import BackButton from '../components/primitives/BackButton';''
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
 
@@ -48,27 +51,35 @@ class Join extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Join Game Screen</Text> 
-        <Text>{this.state.error}</Text>
-        <TextInput 
-          style={styles.textInput}
-          autoCompleteType={"off"}
-          autoCorrect={false}
-          onChangeText={text=>this.setState({name: text})}
-          placeholder={"Enter Name"}
-          value={this.state.name}
-        />
-        <TextInput 
-          style={styles.textInput}
-          autoCapitalize={"characters"}
-          autoCompleteType={"off"}
-          autoCorrect={false}
-          onChangeText={text=>this.setState({joinCode: text})}
-          placeholder={"Enter Game ID"}
-          value={this.state.joinCode}
-        />
-        <Button title="Submit" onPress={()=>this.pressSubmit()}/> 
-        <Button title="Back" onPress={()=>this.props.changeScreen(Screens.HOME)}/> 
+        <View style={styles.mainView}>
+          <Text style={styles.title}>Join Game</Text>
+          {/* THIS ERROR HAS TO HAVE PROPER UI */}
+          <Text>{this.state.error}</Text> 
+          <PrimaryTextInput 
+            autoCorrect={false}
+            marginBottom={10}
+            onChangeText={text=>this.setState({name: text})}
+            placeholder={'Your Name'}
+            value={this.state.name}
+          />
+          <PrimaryTextInput 
+            autoCapitalize={"characters"}
+            autoCorrect={false}
+            onChangeText={text=>this.setState({joinCode: text})}
+            placeholder={"Game ID"}
+            value={this.state.joinCode}
+          />
+          <PrimaryButton
+            text={'Join'}
+            onPress={()=>this.pressSubmit()}
+          />
+        </View>
+        <View style={styles.backButtonView}>
+          <BackButton 
+            onPress={()=>this.props.changeScreen(Screens.HOME)}
+            margin={Dimensions.get('screen').width/15}
+          />
+        </View>
       </View>
     );
   }
@@ -77,18 +88,28 @@ class Join extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  textInput: {
-    borderColor: 'gray',
-    borderRadius: 10,
-    borderWidth: 1,
-    height: 40,
-    margin: 5,
-    padding: 4,
-    width: 200
+  title: {
+    fontSize: Dimensions.get('screen').height/20,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    marginBottom: 10,
+  },
+  mainView: {
+    flex: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  backButtonView: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   }
 });
 

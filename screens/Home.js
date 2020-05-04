@@ -36,18 +36,22 @@ export default function Home(props) {
       justifyContent: 'center',
     },
     titleView: {
-      flex: 5,
+      flex: 2,
       justifyContent: 'center',
       width: Dimensions.get('screen').width
     },
     title: {
-      fontSize: 60,
-      fontFamily: 'poppins-semibold',
-      color: '#515151',
-      fontWeight: 'bold',
-      textAlign: 'center'
+      fontSize: 80,
+      fontFamily: 'poppins-extrabold',
+      color: '#ffffff',
+      textAlign: 'center',
+      textShadowOffset: { width: 5, height: 7 },
+      textShadowRadius: 1,
+      textShadowColor: '#000000cc',
     },
     buttonView: {
-      flex: 2
+      flex: 1,
+      minWidth: '85%',
+      display: 'flex',
     }
   });

@@ -2,13 +2,14 @@ import React, {Component} from 'react';
 import { StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 
-PrimaryButton.PropTypes = {
+PrimaryButton.propTypes = {
   text: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
-  color: PropTypes.string, // Blue by default
+  color: PropTypes.string, // White by default
   hasOutline: PropTypes.bool, // No outline by default
   outlineColor: PropTypes.string, //White by default
-  textColor: PropTypes.string // White by default
+  textColor: PropTypes.string, // White by default
+  width: PropTypes.string //85% by default
 }
 
 export default function PrimaryButton(props) {
@@ -16,8 +17,15 @@ export default function PrimaryButton(props) {
   let textStyling = {}
   if (props.color) viewStyling.backgroundColor = props.color
   if (props.textColor) textStyling.color = props.textColor
-  if (props.hasOutline) viewStyling.borderWidth = 1
+  if (props.hasOutline) {
+    viewStyling.borderWidth = 1
+    viewStyling.borderColor = `#ffffff`
+  }
   if (props.borderColor) viewStyling.borderColor = props.outlineColor
+  if (props.width) {
+    viewStyling.minWidth = props.width
+    viewStyling.maxWidth = props.width
+  } 
 
   return(
     <TouchableOpacity 
@@ -31,20 +39,19 @@ export default function PrimaryButton(props) {
 
 const styles = StyleSheet.create({
   button: {
-    paddingLeft: Dimensions.get('screen').width/15,
-    paddingRight: Dimensions.get('screen').width/15,
-    color: "#FFFFFF",
-    backgroundColor: "#107EEB",
+    minWidth: '85%',
+    maxWidth: '85%',
+    backgroundColor: '#ffffff',
     borderRadius: Dimensions.get('screen').height,
     margin: 10,
-    height: Dimensions.get('screen').height/15,
+    height: Dimensions.get('screen').height/13,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
   },
   text: {
-    color: "#FFFFFF",
+    color: '#4b42f5',
     fontFamily: 'poppins-semibold',
-    fontSize: Dimensions.get('screen').height/45,
+    fontSize: Dimensions.get('screen').height/35,
   }
 });
