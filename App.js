@@ -16,6 +16,7 @@ const fetchFonts = async () => {
     'poppins-regular': require('./assets/fonts/poppins/Poppins-Regular.ttf'),
     'poppins-semibold': require('./assets/fonts/poppins/Poppins-SemiBold.ttf'),
     'poppins-extrabold': require('./assets/fonts/poppins/Poppins-ExtraBold.ttf'),
+    'poppins-italic': require('./assets/fonts/poppins/Poppins-Italic.ttf'),
   });
 }
 

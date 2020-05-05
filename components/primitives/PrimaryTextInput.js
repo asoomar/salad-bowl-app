@@ -8,7 +8,9 @@ PrimaryTextInput.propTypes = {
   autoCorrect: PropTypes.bool.isRequired,
   autoCapitalize: PropTypes.string,
   placeholder: PropTypes.string,
-  marginBottom: PropTypes.number
+  marginBottom: PropTypes.number,
+  style: PropTypes.object,
+  placeholderTextColor: PropTypes.string
 }
 
 export default function PrimaryTextInput(props) {
@@ -17,13 +19,13 @@ export default function PrimaryTextInput(props) {
 
   return(
     <TextInput
-      style={[styles.input, viewStyling]} 
+      style={[styles.input, viewStyling, props.style]} 
       autoCompleteType={"off"}
       autoCorrect={props.autoCorrect}
       autoCapitalize={props.autoCapitalize}
       onChangeText={text=>props.onChangeText(text)}
       placeholder={props.placeholder}
-      placeholderTextColor={`#342bcf`}
+      placeholderTextColor={props.placeholderTextColor || `#342bcf`}
       value={props.value}
     />
   )
@@ -44,7 +46,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     fontSize: Dimensions.get('screen').height/25,
     fontFamily: 'poppins-semibold',
-    color: "#ffffff",
     textAlign: 'center'
   }
 });

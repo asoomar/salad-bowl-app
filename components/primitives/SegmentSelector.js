@@ -3,24 +3,39 @@ import { StyleSheet, Dimensions, TouchableOpacity, Text, View } from 'react-nati
 import PropTypes from 'prop-types';
 
 SegmentSelector.propTypes = {
-  segmentOne: PropTypes.string.isRequired,
-  segmentTwo: PropTypes.string.isRequired,
+  // segmentOne: PropTypes.string.isRequired,
+  // segmentTwo: PropTypes.string.isRequired,
+  segments: PropTypes.array.isRequired,
   currentSegment: PropTypes.string.isRequired,
   onChangeSegment: PropTypes.func.isRequired,
 }
 
 export default function SegmentSelector(props) {
-  const segmentOneStyle = props.segmentOne === props.currentSegment 
-    ? styles.active
-    : styles.disabled
+  // const segmentOneStyle = props.segmentOne === props.currentSegment 
+  //   ? styles.active
+  //   : styles.disabled
 
-  const segmentTwoStyle = props.segmentTwo === props.currentSegment 
-  ? styles.active
-  : styles.disabled
+  // const segmentTwoStyle = props.segmentTwo === props.currentSegment 
+  // ? styles.active
+  // : styles.disabled
   
   return (
     <View style={styles.container}>
-      <TouchableOpacity
+      {props.segments.map((segment, i) => {
+        const segStyle = segment === props.currentSegment  
+          ? styles.active 
+          : styles.disabled
+        return (
+          <TouchableOpacity
+            key={i}
+            style={styles.button}
+            onPress={() => props.onChangeSegment(segment)}
+          >
+            <Text style={segStyle}>{segment}</Text>
+          </TouchableOpacity>
+        )
+      })}
+      {/* <TouchableOpacity
         style={styles.button}
         onPress={() => props.onChangeSegment(props.segmentOne)}>
         <Text style={segmentOneStyle}>{props.segmentOne}</Text>
@@ -30,7 +45,7 @@ export default function SegmentSelector(props) {
         style={styles.button}
         onPress={() => props.onChangeSegment(props.segmentTwo)}>
         <Text style={segmentTwoStyle}>{props.segmentTwo}</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   )
 }

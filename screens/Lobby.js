@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
 import SegmentSelector from '../components/primitives/SegmentSelector';
 import PrimaryButton from '../components/primitives/PrimaryButton';
-import MyWords from '../components/segments/MyWords';
+import YourWords from '../components/segments/YourWords';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
 import _ from 'lodash';
@@ -16,7 +16,7 @@ class Lobby extends Component {
     waitingPlayerKeys: [],
     words: [{key: '', word: ''}, {key: '', word: ''}],
     wordCount: 0,
-    currentSegment: 'My Words'
+    currentSegment: 'Your Words'
   }
 
   componentDidMount() {
@@ -215,19 +215,34 @@ class Lobby extends Component {
   }
 
   render() {
-    let playerList = this.state.players.map((player, i)=>{
-      let prefix = this.state.waitingPlayerKeys.includes(player[0]) ? '*' : '';
-      return(<Text key={i}>{prefix}{player[1]}</Text>);
-    });
+    let playerList = (
+      <ScrollView style={styles.playerList}>
+        {this.state.players.map((player, i) => {
+          let playerState = this.state.waitingPlayerKeys.includes(player[0]) ? 'waiting...' : 'Ready';
+          let suffix = player[0] === this.props.playerID ? ' (You)' : null;
+          return(
+            <View key={i} style={styles.playerItem}>
+              <Text style={styles.playerName}>{player[1]}{suffix}</Text>
+              {playerState === 'waiting...' 
+                ? <Text style={styles.playerWaiting}>{playerState}</Text> : null}
+              {playerState === 'Ready' 
+                ? <Text style={styles.playerReady}>{playerState}</Text> : null}
+            </View>
+          );
+        })}
+      </ScrollView>
+      );
 
     let yourWords = this.state.editWords
-      ? <MyWords 
+      ? <YourWords 
         firstWordValue={this.state.words[0].word}
         secondWordValue={this.state.words[1].word}
         onFirstWordChange={text => this.updateWord(text, 0)}
         onSecondWordChange={text => this.updateWord(text, 1)}
         onSubmit={() => this.submitWords()}
         error={this.state.error}
+        style={styles.textInput}
+        placeholderTextColor='#dddddd'
         />
       : (
         <View style={styles.myWords}>
@@ -248,6 +263,17 @@ class Lobby extends Component {
           />
         </View>
       )
+    
+    let morePane = (
+      <View style={styles.moreView}>
+        <PrimaryButton 
+          text='Leave Game'
+          onPress={()=>this.goHome()}
+          buttonStyle={styles.leaveButton}
+          textStyle={styles.leaveButtonText}
+        />
+      </View>
+    )
 
 
     return (
@@ -263,27 +289,27 @@ class Lobby extends Component {
           </Text>
         </View>
         <SegmentSelector
-          segmentOne='My Words'
-          segmentTwo='Players'
-          currentSegment={this.state.currentSegment}
-          onChangeSegment={segment => this.setState({currentSegment: segment})}
-        />
+            segments={['Your Words', 'Players', 'More']}
+            currentSegment={this.state.currentSegment}
+            onChangeSegment={segment => this.setState({currentSegment: segment})}
+          />
         <View style={styles.body}>
-          {this.state.currentSegment === 'My Words' ? yourWords : null}
+          {this.state.currentSegment === 'Your Words' ? yourWords : null}
           {this.state.currentSegment === 'Players' ? playerList : null}
+          {this.state.currentSegment === 'More' ? morePane : null}
         </View>
         <View style={styles.footer}>
           {this.state.wordCount < this.state.players.length*2
           ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>
           : this.props.playerID === this.state.host.id 
-            ? <Button 
-                title='Start Game!' 
-                disabled={this.state.wordCount < this.state.players.length*2}
+            ? <PrimaryButton
+                text='Continue'
                 onPress={()=>this.startGame()}
-              /> 
+                buttonStyle={styles.continueButton}
+                textStyle={styles.continueButtonText}
+              />
             : <Text style={styles.footerText}>Waiting for host to continue...</Text>   
-          }
-          <Button title="Leave" onPress={()=>this.goHome()}/> 
+          } 
         </View>
       </View>
     );
@@ -295,7 +321,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    display: 'flex'
+    display: 'flex',
   },
   header: {
     flex: 2,
@@ -303,6 +329,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
+    backgroundColor: '#4b42f5',
+    minWidth: '100%'
   },
   title: {
     fontSize: Dimensions.get('screen').height/20,
@@ -324,41 +352,106 @@ const styles = StyleSheet.create({
   body: {
     display: 'flex',
     flexDirection: 'column',
-    flex: 4
+    flex: 4,
+    backgroundColor: '#ffffff',
+    minWidth: '100%',
   },
   myWords: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingTop: 10
   },
   myWord: {
     fontSize: Dimensions.get('screen').height/30,
     fontFamily: 'poppins-semibold',
-    color: '#fff',
+    color: '#000000',
+  },
+  moreView: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  leaveButton: {
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#ff0000',
+    minWidth: '60%',
+    maxWidth: '60%',
+    height: Dimensions.get('screen').height/15,
+    margin: 20
+  },
+  leaveButtonText: {
+    color: '#ff0000',
   },
   editButton: {
-    backgroundColor: '#4b42f5',
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    minWidth: '70%',
-    maxWidth: '70%',
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#4b42f5',
+    minWidth: '60%',
+    maxWidth: '60%',
     height: Dimensions.get('screen').height/15,
     marginTop: 5
   },
   editButtonText: {
-    color: '#ffffff',
+    color: '#4b42f5',
   },
   footer: {
     display: 'flex',
     flexDirection: 'column',
-    flex: 1
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#4b42f5',
+    minWidth: '100%',
   },
   footerText: {
     fontSize: Dimensions.get('screen').height/40,
     fontFamily: 'poppins-semibold',
     color: '#fff',
     textAlign: 'center'
+  },
+  continueButton: {
+    backgroundColor: '#4b42f5',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    height: Dimensions.get('screen').height/15,
+    // marginTop: 5
+  },
+  continueButtonText: {
+    color: '#ffffff',
+  },
+  textInput: {
+    color: '#4b42f5cc',
+    backgroundColor: '#eeeeee',
+    height: Dimensions.get('screen').height/15,
+  },
+  playerList: {
+    padding: 15,
+  },
+  playerItem: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 10
+  },
+  playerName: {
+    fontSize: Dimensions.get('screen').height/35,
+    fontFamily: 'poppins-semibold',
+    color: '#000',
+  },
+  playerWaiting: {
+    fontSize: Dimensions.get('screen').height/45,
+    fontFamily: 'poppins-italic',
+    color: '#aaa',
+  },
+  playerReady: {
+    fontSize: Dimensions.get('screen').height/40,
+    fontFamily: 'poppins-semibold',
+    color: '#4b42f5',
   }
 });
 
