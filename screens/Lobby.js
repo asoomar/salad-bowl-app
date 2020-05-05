@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput, TouchableNativeFeedback } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, Dimensions } from 'react-native';
+import SegmentSelector from '../components/primitives/SegmentSelector';
+import PrimaryButton from '../components/primitives/PrimaryButton';
+import MyWords from '../components/segments/MyWords';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
 import _ from 'lodash';
@@ -13,6 +16,7 @@ class Lobby extends Component {
     waitingPlayerKeys: [],
     words: [{key: '', word: ''}, {key: '', word: ''}],
     wordCount: 0,
+    currentSegment: 'My Words'
   }
 
   componentDidMount() {
@@ -155,7 +159,7 @@ class Lobby extends Component {
         this.db.getRef(`words/${this.props.gameID}/${this.state.words[i].key}`)
         .update({
           word: this.state.words[i].word.trim().toUpperCase()
-        });
+        })
       }
     } else { // Add words to database
       let gameWordsRef = this.db.getRef('words/' + this.props.gameID);
@@ -174,7 +178,7 @@ class Lobby extends Component {
       .then(()=> 
       console.log(`No longer waiting for ${this.props.playerID} (${this.props.screenName}) to submit words`))
     }
-    this.setState({editWords: false});
+    this.setState({editWords: false, currentSegment: 'Players'});
     this.setState((prevState) => {
       let newWords = [...prevState.words];
       for (let i = 0; i < newWords.length; i++) {
@@ -216,51 +220,71 @@ class Lobby extends Component {
       return(<Text key={i}>{prefix}{player[1]}</Text>);
     });
 
-    let yourWords = this.state.editWords ? 
-      (<>
-        <Text>{this.state.error}</Text> 
-        <TextInput 
-          style={styles.textInput}
-          autoCompleteType={"off"}
-          autoCorrect={false}
-          onChangeText={text=>this.updateWord(text, 0)}
-          placeholder={"Enter Your First Word"}
-          value={this.state.words[0].word}
+    let yourWords = this.state.editWords
+      ? <MyWords 
+        firstWordValue={this.state.words[0].word}
+        secondWordValue={this.state.words[1].word}
+        onFirstWordChange={text => this.updateWord(text, 0)}
+        onSecondWordChange={text => this.updateWord(text, 1)}
+        onSubmit={() => this.submitWords()}
+        error={this.state.error}
         />
-        <TextInput 
-          style={styles.textInput}
-          autoCompleteType={"off"}
-          autoCorrect={false}
-          onChangeText={text=>this.updateWord(text, 1)}
-          placeholder={"Enter Your Second Word"}
-          value={this.state.words[1].word}
-        />
-        <Button title="Submit Words" onPress={()=>this.submitWords()}/>
-      </>) 
-      :
-      (<>
-        {this.state.words.map((wordObject) => {
-          return (<Text key={wordObject.key}>{wordObject.word}</Text>)
-        })}
-        <Button title="Edit" onPress={()=>this.setState({editWords: true})}/>
-      </>)
+      : (
+        <View style={styles.myWords}>
+          {this.state.words.map((wordObject) => {
+            return (
+            <Text 
+              key={wordObject.key}
+              style={styles.myWord}
+            >
+              {wordObject.word}
+            </Text>)
+          })}
+          <PrimaryButton 
+            text='Edit Words'
+            onPress={() => this.setState({editWords: true})}
+            buttonStyle={styles.editButton}
+            textStyle={styles.editButtonText}
+          />
+        </View>
+      )
 
 
     return (
       <View style={styles.container}>
-        <Text style={styles.heading}>Lobby Game Screen</Text> 
-        <Text style={styles.heading}>Game ID: {this.props.gameID}</Text> 
-        {yourWords}
-        <Text>{this.state.wordCount}/{this.state.players.length*2} words submitted</Text>
-        {this.props.playerID === this.state.host.id ?
-        <Button 
-          title="Start Game!" 
-          disabled={this.state.wordCount < this.state.players.length*2}
-          onPress={()=>this.startGame()}
-        /> : <Text>Only the host can start the game</Text>}
-        <Text style={styles.heading}>Players</Text>
-        {playerList}
-        <Button title="Leave" onPress={()=>this.goHome()}/> 
+        <View style={styles.header}>
+          <Text style={styles.title}>Lobby</Text> 
+          <Text style={styles.subtitle}>Game ID is {this.props.gameID}</Text> 
+          <Text style={styles.minititle}>
+            {this.state.wordCount}/{this.state.players.length*2} words
+          </Text>
+          <Text style={styles.minititle}>
+            {this.state.players.length} players
+          </Text>
+        </View>
+        <SegmentSelector
+          segmentOne='My Words'
+          segmentTwo='Players'
+          currentSegment={this.state.currentSegment}
+          onChangeSegment={segment => this.setState({currentSegment: segment})}
+        />
+        <View style={styles.body}>
+          {this.state.currentSegment === 'My Words' ? yourWords : null}
+          {this.state.currentSegment === 'Players' ? playerList : null}
+        </View>
+        <View style={styles.footer}>
+          {this.state.wordCount < this.state.players.length*2
+          ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>
+          : this.props.playerID === this.state.host.id 
+            ? <Button 
+                title='Start Game!' 
+                disabled={this.state.wordCount < this.state.players.length*2}
+                onPress={()=>this.startGame()}
+              /> 
+            : <Text style={styles.footerText}>Waiting for host to continue...</Text>   
+          }
+          <Button title="Leave" onPress={()=>this.goHome()}/> 
+        </View>
       </View>
     );
   }
@@ -271,18 +295,70 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    display: 'flex'
   },
-  heading: {
-    fontWeight: 'bold'
+  header: {
+    flex: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
-  textInput: {
-    borderColor: 'gray',
-    borderRadius: 10,
+  title: {
+    fontSize: Dimensions.get('screen').height/20,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    marginTop: 15,
+  },
+  subtitle: {
+    fontSize: Dimensions.get('screen').height/35,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    marginBottom: 10,
+  },
+  minititle: {
+    fontSize: Dimensions.get('screen').height/55,
+    fontFamily: 'poppins-semibold',
+    color: '#ffffffaa',
+  },
+  body: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 4
+  },
+  myWords: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  myWord: {
+    fontSize: Dimensions.get('screen').height/30,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+  },
+  editButton: {
+    backgroundColor: '#4b42f5',
     borderWidth: 1,
-    height: 40,
-    margin: 5,
-    padding: 4,
-    width: 200
+    borderColor: '#ffffff',
+    minWidth: '70%',
+    maxWidth: '70%',
+    height: Dimensions.get('screen').height/15,
+    marginTop: 5
+  },
+  editButtonText: {
+    color: '#ffffff',
+  },
+  footer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1
+  },
+  footerText: {
+    fontSize: Dimensions.get('screen').height/40,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    textAlign: 'center'
   }
 });
 

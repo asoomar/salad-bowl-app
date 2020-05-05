@@ -9,7 +9,9 @@ PrimaryButton.propTypes = {
   hasOutline: PropTypes.bool, // No outline by default
   outlineColor: PropTypes.string, //White by default
   textColor: PropTypes.string, // White by default
-  width: PropTypes.string //85% by default
+  width: PropTypes.string, //85% by default
+  buttonStyle: PropTypes.object,
+  textStyle: PropTypes.object,
 }
 
 export default function PrimaryButton(props) {
@@ -29,10 +31,10 @@ export default function PrimaryButton(props) {
 
   return(
     <TouchableOpacity 
-      style={[styles.button, viewStyling]} 
+      style={[styles.button, viewStyling, props.buttonStyle]} 
       onPress={() => props.onPress()}
     >
-      <Text style={[styles.text, textStyling]}>{props.text}</Text>
+      <Text style={[styles.text, textStyling, props.textStyle]}>{props.text}</Text>
     </TouchableOpacity>
   )
 };
