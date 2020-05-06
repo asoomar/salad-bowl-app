@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
+import PrimaryButton from '../components/primitives/PrimaryButton';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
 
@@ -52,7 +53,8 @@ class Teams extends Component {
 
   getTeam(teamName) {
     return this.state[teamName].map((player, i) => {
-      return(<Text key={i}>{player[1].name}</Text>);
+      let suffix = player[0] === this.props.playerID ? ' (You)' : null
+      return(<Text key={i} style={styles.player}>{player[1].name}{suffix}</Text>);
     });
   }
 
@@ -83,15 +85,32 @@ class Teams extends Component {
 
     return (
       <View style={styles.container}>
-        <Text style={styles.heading}>Teams Screen</Text> 
-        <Text style={[styles.heading, styles.blue]}>Team 1</Text> 
-        {teamOne}
-        <Text style={[styles.heading, styles.red]}>Team 2</Text> 
-        {teamTwo}
-        {this.props.playerID === this.state.host.id ? 
-        <Button title="Start" onPress={()=>this.startGame()}/> :
-        <Text>Waiting on the host to start the game</Text>
-        }
+        <View style={styles.header}>
+          <Text style={styles.title}>Teams</Text> 
+        </View>
+        <View style={styles.body}> 
+          <ScrollView contentContainerStyle={styles.scroll}>
+            <View style={styles.team}>
+              <Text style={styles.teamName}>Team 1</Text> 
+              {teamOne}
+            </View>
+            <View style={styles.team}>
+              <Text style={styles.teamName}>Team 2</Text> 
+              {teamTwo}
+            </View>
+          </ScrollView>
+        </View>
+        <View style={styles.footer}>
+          {this.props.playerID === this.state.host.id
+          ? <PrimaryButton
+            text='Start'
+            onPress={()=>this.startGame()}
+            buttonStyle={styles.startButton}
+            textStyle={styles.startButtonText}
+          /> 
+          : <Text style={styles.footerText}>Waiting for host to start game...</Text>
+          }
+        </View>
       </View>
     );
   }
@@ -100,18 +119,81 @@ class Teams extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heading: {
-    fontWeight: 'bold'
+  header: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#4b42f5',
+    minWidth: '100%'
   },
-  red: {
-    color: 'red'
+  title: {
+    fontSize: Dimensions.get('screen').height/20,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    marginTop: 15,
   },
-  blue: {
-    color: 'blue'
+  scroll: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    minWidth: '100%'
+  },
+  body: {
+    flex: 5,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    backgroundColor: '#ffffff',
+    minWidth: '100%'
+  },
+  team: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  teamName: {
+    fontSize: Dimensions.get('screen').height/30,
+    fontFamily: 'poppins-semibold',
+    color: '#4b42f5',
+    marginTop: 15,
+  },
+  player: {
+    fontSize: Dimensions.get('screen').height/45,
+    fontFamily: 'poppins-semibold',
+    color: '#000',
+    marginTop: 5,
+  },
+  footer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4b42f5',
+    minWidth: '100%'
+  },
+  footerText: {
+    fontSize: Dimensions.get('screen').height/40,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    textAlign: 'center'
+  },
+  startButton: {
+    backgroundColor: '#4b42f5',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    height: Dimensions.get('screen').height/15,
+  },
+  startButtonText: {
+    color: '#ffffff',
   },
 });
 

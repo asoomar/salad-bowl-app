@@ -418,7 +418,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ffffff',
     height: Dimensions.get('screen').height/15,
-    // marginTop: 5
   },
   continueButtonText: {
     color: '#ffffff',

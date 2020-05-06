@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
+import Timer from '../components/primitives/Timer';
 import Fire from '../Fire';
 import UserPlaying from '../components/segments/UserPlaying';
 
@@ -247,24 +248,41 @@ class Game extends Component {
   }
 
   render() {
-    const segment = this.state.isPlaying ? 
-      <UserPlaying 
+    const segment = this.state.isPlaying
+      ? <UserPlaying 
         currentWord={this.state.currentWord.word}
         timerStarted={this.state.isTimerGoing}
         nextWord={() => this.nextWord()}
         pass={() => this.pass()}
         setTimer={(setValue, time) => this.setTimer(setValue,time)}
-      /> : 
-      (this.state.isTeamPlaying ? 
-        <Text>Guess the word</Text> : 
-        <Text>Stay quiet while the other team guesses</Text>);
+        /> 
+      : (this.state.isTeamPlaying 
+        ? <Text>Guess the word</Text> 
+        : <Text>Stay quiet while the other team guesses</Text>)
+    
+    const team1Style = this.props.team === 0 ? null : styles.opposing
+    const team2Style = this.props.team === 1 ? null : styles.opposing
+        
     return (
       <View style={styles.container}>
-        <View style={styles.div}>
-          <Text style={styles.heading}>Game Screen</Text>
-          <Text style={styles.heading}>Round {this.state.round}</Text>
-          <Text style={styles.heading}>Team 1: {this.state.score.team1}</Text> 
-          <Text style={styles.heading}>Team 2: {this.state.score.team2}</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Round {this.state.round}</Text>
+          <View style={styles.score}>
+            <View style={styles.teamScore}>
+              <Text style={[styles.points, team1Style]}>{this.state.score.team1}</Text>
+              <Text style={[styles.team, team1Style]}>Team 1</Text> 
+            </View>
+            <View style={styles.teamScore}>
+              <Text style={[styles.points, team2Style]}>{this.state.score.team2}</Text>
+              <Text style={[styles.team, team2Style]}>Team 2</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.body}>
+          <Timer 
+            time={this.state.timeRemaining/1000}
+            totalTime={60}
+          />
           <Text>{Math.ceil(this.state.timeRemaining/1000)}</Text>
         </View>
         <View style={styles.div}>
@@ -280,9 +298,59 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  header: {
+    flex: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#4b42f5',
+    minWidth: '100%'
+  },
+  title: {
+    fontSize: Dimensions.get('screen').height/20,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    marginTop: 15,
+  },
+  score: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    minWidth: '100%'
+  },
+  teamScore: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'column'
+  },
+  team: {
+    fontSize: Dimensions.get('screen').height/50,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+  },
+  points: {
+    fontSize: Dimensions.get('screen').height/20,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+  },
+  opposing: {
+    color: '#ffffff66'
+  },
+  body: {
+    flex: 5,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    minWidth: '100%'
   },
   div: {
     display: 'flex',
