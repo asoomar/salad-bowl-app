@@ -247,18 +247,27 @@ class Game extends Component {
     }
   }
 
+  getRoundText(round) {
+    switch (round) {
+      case 1:
+        return "Explain the word without using the it!"
+      case 2:
+        return "Act out the word!"
+      case 3:
+        return "Use one word to describe the word without using it!" 
+      default:
+        return "It's your turn!"     
+    }
+
+
+  }
+
   render() {
     const segment = this.state.isPlaying
-      ? <UserPlaying 
-        currentWord={this.state.currentWord.word}
-        timerStarted={this.state.isTimerGoing}
-        nextWord={() => this.nextWord()}
-        pass={() => this.pass()}
-        setTimer={(setValue, time) => this.setTimer(setValue,time)}
-        /> 
+      ? <Text style={styles.footerText}>{this.getRoundText(this.state.round)}</Text>  
       : (this.state.isTeamPlaying 
-        ? <Text>Guess the word</Text> 
-        : <Text>Stay quiet while the other team guesses</Text>)
+        ? <Text style={styles.footerText}>It's your team's turn! Try and the word!</Text> 
+        : <Text style={styles.footerText}>Waiting for the other team's turn to finish...</Text>)
     
     const team1Style = this.props.team === 0 ? null : styles.opposing
     const team2Style = this.props.team === 1 ? null : styles.opposing
@@ -272,6 +281,10 @@ class Game extends Component {
               <Text style={[styles.points, team1Style]}>{this.state.score.team1}</Text>
               <Text style={[styles.team, team1Style]}>Team 1</Text> 
             </View>
+            <Timer 
+              time={this.state.timeRemaining/1000}
+              totalTime={60}
+            />
             <View style={styles.teamScore}>
               <Text style={[styles.points, team2Style]}>{this.state.score.team2}</Text>
               <Text style={[styles.team, team2Style]}>Team 2</Text>
@@ -279,13 +292,17 @@ class Game extends Component {
           </View>
         </View>
         <View style={styles.body}>
-          <Timer 
-            time={this.state.timeRemaining/1000}
-            totalTime={60}
-          />
-          <Text>{Math.ceil(this.state.timeRemaining/1000)}</Text>
+          {this.state.isPlaying
+          ? <UserPlaying 
+              currentWord={this.state.currentWord.word}
+              timerStarted={this.state.isTimerGoing}
+              nextWord={() => this.nextWord()}
+              pass={() => this.pass()}
+              setTimer={(setValue, time) => this.setTimer(setValue,time)}
+            /> 
+          : null}
         </View>
-        <View style={styles.div}>
+        <View style={styles.footer}>
           {segment} 
         </View>
       </View>
@@ -352,14 +369,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     minWidth: '100%'
   },
-  div: {
+  footer: {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     flex: 1,
-    justifyContent: 'center'
+    backgroundColor: '#4b42f5',
+    minWidth: '100%',
+    paddingLeft: 10,
+    paddingRight: 10
   },
-  heading: {
-    fontWeight: 'bold'
+  footerText: {
+    fontSize: Dimensions.get('screen').height/40,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    textAlign: 'center'
   },
 });
 

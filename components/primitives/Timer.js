@@ -5,42 +5,41 @@ import PropTypes from 'prop-types';
 Timer.propTypes = {
   time: PropTypes.number.isRequired,
   totalTime: PropTypes.number.isRequired,
-  width: PropTypes.number // Default is 85
+  color: PropTypes.string,
+  textColor: PropTypes.string
 }
 
 export default function Timer(props) {
-  const width = props.width || 85;
-  const innerWidth = getInnerWidth(props.time, props.totalTime, width);
-  const outerBoxStyle = {minWidth: `${width}%`, maxWidth: `${width}%`}
-  const innerBoxStyle = {minWidth: `${innerWidth}%`, maxWidth: `${innerWidth}%`}
+  let circleStyle = {}
+  let textStyle = {}
+  if (props.color) circleStyle.backgroundColor = props.color
+  if (props.textColor) textStyle.color = props.textColor
+
   return (
-    <View style={[styles.outerBox, outerBoxStyle]}>
-      <View style={[styles.innerBox, innerBoxStyle]}>
-      </View>
+    <View style={[styles.outerCircle, circleStyle]}>
+      <Text style={[styles.text, textStyle]}>
+        {Math.ceil(props.time)}
+      </Text>
     </View>
   )
 };
 
-function getInnerWidth(time, totalTime, width) {
-  let ratio = time/totalTime
-  return ratio * 100
-}
-
 const styles = StyleSheet.create({
-  outerBox: {
-    height: Dimensions.get('screen').height/20,
+  outerCircle: {
+    height: Dimensions.get('screen').width/5,
+    width: Dimensions.get('screen').width/5,
     borderRadius: Dimensions.get('screen').height,
-    borderWidth: 3,
-    borderColor: '#4b42f5',
-    // backgroundColor: '#fff'
+    backgroundColor: '#fff',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-start'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  innerBox: {
-    backgroundColor: '#4b42f5',
-    borderWidth: 2,
-    borderColor: '#4b42f5',
-    borderRadius: Dimensions.get('screen').height,
+  text: {
+    color: '#4b42f5',
+    fontFamily: 'poppins-semibold',
+    fontSize: Dimensions.get('screen').height/20,
+    textAlign: 'center',
+    marginTop: 5,
   }
 })
