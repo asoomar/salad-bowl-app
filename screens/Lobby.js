@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
   playerReady: {
     fontSize: Dimensions.get('screen').height/40,
     fontFamily: 'poppins-semibold',
-    color: '#4b42f5',
+    color: '#54ad18',
   }
 });
 

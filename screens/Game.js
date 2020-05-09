@@ -4,6 +4,7 @@ import Screens from '../constants/Screens';
 import Timer from '../components/primitives/Timer';
 import Fire from '../Fire';
 import UserPlaying from '../components/segments/UserPlaying';
+import OpponentPlaying from '../components/segments/OpponentPlaying';
 
 class Game extends Component {
   state = {
@@ -247,10 +248,12 @@ class Game extends Component {
     }
   }
 
-  getRoundText(round) {
+  getRoundText(round, timerStarted) {
+    if (!timerStarted)
+      return "It's your turn!"
     switch (round) {
       case 1:
-        return "Explain the word without using the it!"
+        return "Explain what the word is without using it!"
       case 2:
         return "Act out the word!"
       case 3:
@@ -264,7 +267,9 @@ class Game extends Component {
 
   render() {
     const segment = this.state.isPlaying
-      ? <Text style={styles.footerText}>{this.getRoundText(this.state.round)}</Text>  
+      ? <Text style={styles.footerText}>
+          {this.getRoundText(this.state.round, this.state.isTimerGoing)}
+        </Text>  
       : (this.state.isTeamPlaying 
         ? <Text style={styles.footerText}>It's your team's turn! Try and the word!</Text> 
         : <Text style={styles.footerText}>Waiting for the other team's turn to finish...</Text>)
@@ -299,8 +304,9 @@ class Game extends Component {
               nextWord={() => this.nextWord()}
               pass={() => this.pass()}
               setTimer={(setValue, time) => this.setTimer(setValue,time)}
+              round={this.state.round}
             /> 
-          : null}
+          : <OpponentPlaying />}
         </View>
         <View style={styles.footer}>
           {segment} 
@@ -377,8 +383,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#4b42f5',
     minWidth: '100%',
-    paddingLeft: 10,
-    paddingRight: 10
+    paddingLeft: 15,
+    paddingRight: 15
   },
   footerText: {
     fontSize: Dimensions.get('screen').height/40,

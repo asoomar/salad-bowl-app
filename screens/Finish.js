@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
+import PrimaryButton from '../components/primitives/PrimaryButton';
 
 class Finish extends Component {
   state = {
@@ -55,16 +56,32 @@ class Finish extends Component {
       message = "Your Team Lost!"
     }
 
+    const team1Style = this.props.team === 0 ? null : styles.opposing
+    const team2Style = this.props.team === 1 ? null : styles.opposing
+
     return (
       <View style={styles.container}>
-        {loading ? <Text> Loading... </Text> : 
+        {loading ? <Text style={styles.message}> Loading... </Text> : 
           <>
-            <Text style={styles.heading}>{message}</Text> 
-            <Text style={[styles.heading, styles.blue]}>Team 1</Text> 
-            <Text> {team1Score} </Text> 
-            <Text style={[styles.heading, styles.red]}>Team 2</Text> 
-            <Text> {team2Score} </Text> 
-            <Button title="Go Home" onPress={()=>this.goHome()}/> 
+            <View style={styles.body}>
+              <Text style={styles.message}>{message}</Text> 
+              <View style={styles.score}>
+                <View style={styles.teamScore}>
+                  <Text style={[styles.points, team1Style]}>{team1Score}</Text>
+                  <Text style={[styles.team, team1Style]}>Team 1</Text> 
+                </View>
+                <View style={styles.teamScore}>
+                  <Text style={[styles.points, team2Style]}>{team2Score}</Text>
+                  <Text style={[styles.team, team2Style]}>Team 2</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.footer}>
+              <PrimaryButton 
+                text="Go Home" 
+                onPress={() => this.goHome()}
+              />
+            </View>
           </>
         }
       </View>
@@ -75,19 +92,60 @@ class Finish extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heading: {
-    fontWeight: 'bold'
+  body: {
+    flex: 6,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  red: {
-    color: 'red'
+  message: {
+    fontSize: Dimensions.get('screen').height/25,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    textAlign: 'center'
   },
-  blue: {
-    color: 'blue'
+  score: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    minWidth: '100%',
+    paddingTop: 20,
   },
+  teamScore: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'column'
+  },
+  team: {
+    fontSize: Dimensions.get('screen').height/50,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+  },
+  points: {
+    fontSize: Dimensions.get('screen').height/20,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+  },
+  opposing: {
+    color: '#ffffff66'
+  },
+  footer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    minWidth: '100%',
+  }
 });
 
 export default Finish;
