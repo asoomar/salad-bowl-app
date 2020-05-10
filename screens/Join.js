@@ -17,31 +17,32 @@ class Join extends Component {
     this.db = Fire.db;
   }
 
-  async canUserJoinGame(gameID) {
+  async canUserJoinGame(gameID) { 
     console.log('Checking if game is valid...');
-    this.db.getRef(`games`).orderByKey().equalTo(gameID).once('value')
-    .then((snapshot) => {
-      if (snapshot.val() == null) { // Check if the game exists
+    try {
+      let snapshot = await this.db.getRef(`games`).orderByKey().equalTo(gameID).once('value');
+      if (snapshot.val() == null) { 
+        // Check if the game exists
         console.log(`Game ${gameID} does not exist`);
         this.setState({error: `Oops, it looks like that game doesn't exist`});
         return false;
-      } else if (snapshot.val()[gameID].round !== '') { // Check to make sure game hasn't started yet
+      } else if (snapshot.val()[gameID].round !== '' 
+        || snapshot.val()[gameID].status !== Screens.LOBBY) { 
+        // Check to make sure game hasn't started yet
         console.log(`Game ${snapshot.val()[gameID].round} has already started`);
         this.setState({error: `Uh oh, it looks like that game has already started`});
         return false;
       }
       return true;
-    })
-    .catch(error => {
-      this.setState({error: `Oh no, something unexpected happened`});
-      console.log("Failed to check if user can join game: " + error);
+    } catch {
+      console.log(`Could not check if game ${gameID} exists`);
       return false;
-    }) 
+    }
   }
 
-  pressSubmit() {
+  async pressSubmit() {
     let gameID = this.state.joinCode.toUpperCase();
-    if (this.canUserJoinGame(gameID)) {
+    if (await this.canUserJoinGame(gameID)) {
       this.props.updateName(this.state.name);
       this.props.updateGameID(gameID);
       this.props.changeScreen(Screens.LOBBY);
