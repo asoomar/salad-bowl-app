@@ -10,6 +10,7 @@ import PrimaryButton from '../components/primitives/PrimaryButton';
 import BackButton from '../components/primitives/BackButton';
 import rand from 'random-seed';
 import Screens from '../constants/Screens';
+import { gameIDLength } from '../constants/Structures';
 import Fire from '../Fire';
 
 class Create extends Component {
@@ -23,24 +24,23 @@ class Create extends Component {
   }
 
   //Returns true if the game id is invalid (already exists)
-  isNotValidGameID(id) {
+  async isNotValidGameID(id) {
     if (id === '') {
       return true;
     }
-    this.db.getRef(`games`).orderByKey().equalTo(id).once('value')
-    .then((snapshot) => {
+    try {
+      let snapshot = await this.db.getRef(`games`).orderByKey().equalTo(id).once('value');
       if (snapshot.val() == null) { // We want to make sure the game doesn't exist yet
-        console.log(`Game ID (${id}) does not exist yet`)
+        console.log(`Game ID (${id}) is valid`)
         return false;
       } else {
-        console.log(`Game id (${id}) already exists`); 
+        console.log(`Game id (${id}) is not valid`); 
         return true;
       }
-    })
-    .catch(error => {
+    } catch {
       console.log(`Failed to check if game id ${id} is valid`);
       return true;
-    })
+    }
   }
 
   makeGameID(length) {
@@ -57,12 +57,11 @@ class Create extends Component {
     this.setState({name: updatedName});
   }
 
-  pressSubmit() {
+  async pressSubmit() {
     Keyboard.dismiss();
-    let newGameID = this.makeGameID(5);
-    if (this.isNotValidGameID(newGameID)) {
-      this.setState({error: `Oops, something went wrong on our end. Try creating a game again!`});
-      return;
+    let newGameID = this.makeGameID(gameIDLength);
+    while (await this.isNotValidGameID(newGameID)) {
+      newGameID = this.makeGameID(gameIDLength);
     }
     let gameRef = this.db.getRef('games');
     gameRef.child(newGameID).set({ 

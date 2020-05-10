@@ -4,6 +4,7 @@ import PrimaryTextInput from '../components/primitives/PrimaryTextInput';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import BackButton from '../components/primitives/BackButton';''
 import Screens from '../constants/Screens';
+import { gameIDLength } from '../constants/Structures';
 import Fire from '../Fire';
 
 class Join extends Component {
@@ -42,8 +43,16 @@ class Join extends Component {
 
   async pressSubmit() {
     let gameID = this.state.joinCode.toUpperCase();
+    if (this.state.name.trim() < 1) {
+      this.setState({error: `You gotta put in a valid name`});
+      return
+    }
+    if (gameID.length !== gameIDLength) {
+      this.setState({error: `Game ID should be ${gameIDLength} characters`});
+      return
+    }
     if (await this.canUserJoinGame(gameID)) {
-      this.props.updateName(this.state.name);
+      this.props.updateName(this.state.name.trim());
       this.props.updateGameID(gameID);
       this.props.changeScreen(Screens.LOBBY);
     }
