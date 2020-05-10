@@ -25,7 +25,7 @@ class Join extends Component {
       if (snapshot.val() == null) { 
         // Check if the game exists
         console.log(`Game ${gameID} does not exist`);
-        this.setState({error: `Oops, it looks like that game doesn't exist`});
+        this.setState({error: `It doesn't look like that game exists`});
         return false;
       } else if (snapshot.val()[gameID].round !== '' 
         || snapshot.val()[gameID].status !== Screens.LOBBY) { 
@@ -44,7 +44,7 @@ class Join extends Component {
   async pressSubmit() {
     let gameID = this.state.joinCode.toUpperCase();
     if (this.state.name.trim() < 1) {
-      this.setState({error: `You gotta put in a valid name`});
+      this.setState({error: `You must enter a name`});
       return
     }
     if (gameID.length !== gameIDLength) {
@@ -63,8 +63,9 @@ class Join extends Component {
       <View style={styles.container}>
         <View style={styles.mainView}>
           <Text style={styles.title}>Join Game</Text>
-          {/* THIS ERROR HAS TO HAVE PROPER UI */}
-          <Text>{this.state.error}</Text> 
+          <View style={styles.errorBox}>
+            <Text style={styles.error}>{this.state.error}</Text> 
+          </View>
           <PrimaryTextInput 
             autoCorrect={false}
             marginBottom={10}
@@ -120,6 +121,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  errorBox: {
+    minHeight: Dimensions.get('screen').height/25,
+    maxHeight: Dimensions.get('screen').height/25,
+  },
+  error: {
+    fontSize: Dimensions.get('screen').height/40,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
   }
 });
 

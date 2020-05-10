@@ -59,6 +59,10 @@ class Create extends Component {
 
   async pressSubmit() {
     Keyboard.dismiss();
+    if (this.state.name.trim() < 1) {
+      this.setState({error: `You must enter a name`});
+      return
+    }
     let newGameID = this.makeGameID(gameIDLength);
     while (await this.isNotValidGameID(newGameID)) {
       newGameID = this.makeGameID(gameIDLength);
@@ -76,13 +80,13 @@ class Create extends Component {
     .then(() => {
       console.log(`Game created. ID: ${newGameID}`);
       // Add host to game
-      this.db.getRef(`players/${newGameID}`).push(this.state.name)
+      this.db.getRef(`players/${newGameID}`).push(this.state.name.trim())
       .then((value) => {
         this.props.setPlayerID(value.key)
         // Add player to 'waiting' state to indicate (to others) they haven't submitted words
-        this.db.getRef(`games/${newGameID}/waiting/${value.key}`).set(this.state.name);
-        this.db.getRef(`games/${newGameID}/host`).set({[value.key]: this.state.name});
-        this.props.updateName(this.state.name);
+        this.db.getRef(`games/${newGameID}/waiting/${value.key}`).set(this.state.name.trim());
+        this.db.getRef(`games/${newGameID}/host`).set({[value.key]: this.state.name.trim()});
+        this.props.updateName(this.state.name.trim());
         this.props.updateGameID(newGameID);
         this.props.changeScreen(Screens.LOBBY);
       });
@@ -95,7 +99,9 @@ class Create extends Component {
       <View style={styles.container}>
         <View style={styles.mainView}>
           <Text style={styles.title}>Create Game</Text>
-          <Text>{this.state.error}</Text>
+          <View style={styles.errorBox}>
+            <Text style={styles.error}>{this.state.error}</Text>
+          </View>
           <PrimaryTextInput 
             autoCorrect={false}
             onChangeText={text=>this.updateName(text)}
@@ -143,6 +149,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  errorBox: {
+    minHeight: Dimensions.get('screen').height/25,
+    maxHeight: Dimensions.get('screen').height/25,
+  },
+  error: {
+    fontSize: Dimensions.get('screen').height/40,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
   }
 });
 
