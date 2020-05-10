@@ -25,6 +25,17 @@ class Game extends Component {
   componentDidMount() {
     this.db = Fire.db;
 
+    // Set team if it was not already set
+    if (this.props.team !== 0 && this.props.team !== 1) {
+      this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}/team`).on('value', (snapshot) => {
+        if (!isValidSnapshot(snapshot, 10)) {
+          this.props.changeScreen(Screens.HOME);
+          return
+        }
+        this.props.updateTeam(snapshot.val());
+      })
+    }
+
     // Listen for who is currently playing
     this.db.getRef(`games/${this.props.gameID}/currentPlayer`).on('value', (snapshot) => {
       // Assumes there is only 1 object and the first one is the current player

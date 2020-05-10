@@ -26,11 +26,11 @@ class Lobby extends Component {
     if (this.props.playerID === '') { //If host was already added, don't add again
       // Add player to the list of players for the game
       this.db.getRef('players/' + this.props.gameID).push(this.props.screenName)
-        .then((value) => {
-          this.props.setPlayerID(value.key)
-          // Add player to 'waiting' state to indicate (to others) they haven't submitted words
-          this.db.getRef(`games/${this.props.gameID}/waiting/${value.key}`).set(this.props.screenName);
-        });
+      .then((value) => {
+        this.props.setPlayerID(value.key)
+        // Add player to 'waiting' state to indicate (to others) they haven't submitted words
+        this.db.getRef(`games/${this.props.gameID}/waiting/${value.key}`).set(this.props.screenName);
+      });
     }
 
     //Listen for Host change
@@ -316,10 +316,9 @@ class Lobby extends Component {
           {this.state.currentSegment === 'More' ? morePane : null}
         </View>
         <View style={styles.footer}>
-          {/* {this.state.players.length < 4 
+          {this.state.players.length < 4 
           ? <Text style={styles.footerText}>{this.getWaitingToJoinText()}</Text>
-          :  */}
-          {this.state.wordCount < this.state.players.length*2
+          : this.state.wordCount < this.state.players.length*2
           ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>
           : this.props.playerID === this.state.host.id 
             ? <PrimaryButton

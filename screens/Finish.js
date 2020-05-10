@@ -22,7 +22,6 @@ class Finish extends Component {
       let scores = Object.entries(snapshot.val());
       let team1Pts = 0;
       let team2Pts = 0;
-      console.log(scores);
       for (let i = 0; i < scores.length; i++) {
         if (scores[i][0] === 'team1') {
           team1Pts = scores[i][1]

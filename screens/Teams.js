@@ -9,11 +9,19 @@ class Teams extends Component {
   state = {
     host: {name: null, id: null},
     team1: [],
-    team2: []
+    team2: [],
+    stopTasks: false,
   }
 
   componentDidMount() {
     this.db = Fire.db;
+
+    // Listen for game to start
+    this.db.getRef(`games/${this.props.gameID}/status`).on('value', (snapshot) => {
+      if (snapshot.val() === Screens.GAME) {
+        this.props.changeScreen(Screens.GAME);
+      }
+    });
 
     // Get player list to see the teams
     this.db.getRef(`players/${this.props.gameID}`).on('value', (snapshot) => {
@@ -34,13 +42,9 @@ class Teams extends Component {
           this.props.updateTeam(players[i][1].team);
         }
       }
-      this.setState({team1: team1Players, team2: team2Players});  
-    });
-
-    // Listen for game to start
-    this.db.getRef(`games/${this.props.gameID}/status`).on('value', (snapshot) => {
-      if (snapshot.val() === Screens.GAME) {
-        this.props.changeScreen(Screens.GAME);
+      // Check if component unmounted already
+      if (this.state.stopTasks === false) {
+        this.setState({team1: team1Players, team2: team2Players});  
       }
     });
 
@@ -51,11 +55,17 @@ class Teams extends Component {
         return
       }
       let host = Object.entries(snapshot.val())[0];
-      this.setState({host: {name: host[1], id: host[0]}});
+
+      // Check if component unmounted already
+      if (this.state.stopTasks === false) {
+        this.setState({host: {name: host[1], id: host[0]}});
+      }
     });
   }
 
   componentWillUnmount() {
+    console.log('Canceling all teams subscriptions')
+    this.setState({stopTasks: true})
     this.db.getRef(`players/${this.props.gameID}`).off();
     this.db.getRef(`games/${this.props.gameID}/status`).off();
   }

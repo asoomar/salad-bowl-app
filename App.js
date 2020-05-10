@@ -20,8 +20,6 @@ const fetchFonts = async () => {
   });
 }
 
-//ADD CODE SO THAT ON ANY DATABASE ACCESS ERROR, EVERYTHING IS SET TO DEFAULT
-//AND THE USER IS DIRECTED BACK TO THE HOME SCREEN
 export default function App() {
   //Application state
   const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
@@ -81,7 +79,6 @@ export default function App() {
         <Lobby 
           changeScreen={(screen) => setCurrentScreen(screen)}
           setPlayerID={(id) => setPlayerID(id)}
-          updateGameID={(id)=>setGameID(id)}
           gameID={gameID}
           playerID={playerID}
           screenName={name}/> 
@@ -90,34 +87,34 @@ export default function App() {
       {/* TEAMS SCREEN */}
       {currentScreen === Screens.TEAMS ? 
         <Teams
-        changeScreen={(screen) => setCurrentScreen(screen)}
-        setPlayerID={(id) => setPlayerID(id)}
-        updateGameID={(id) => setGameID(id)}
-        updateTeam={(team) => setTeam(team)}
-        gameID={gameID}
-        playerID={playerID}
-        screenName={name}/> 
-      : null}
+          changeScreen={(screen) => setCurrentScreen(screen)}
+          updateTeam={(team) => setTeam(team)}
+          currentScreen={currentScreen}
+          gameID={gameID}
+          playerID={playerID}
+          screenName={name}/> 
+        : null}
 
       {/* GAME SCREEN */}
       {currentScreen === Screens.GAME ? 
         <Game
-        changeScreen={(screen) => setCurrentScreen(screen)}
-        gameID={gameID}
-        playerID={playerID}
-        screenName={name}
-        team={team}/> 
-      : null}
+          changeScreen={(screen) => setCurrentScreen(screen)}
+          updateTeam={(team) => setTeam(team)}
+          gameID={gameID}
+          playerID={playerID}
+          screenName={name}
+          team={team}/> 
+        : null}
 
       {/* FINISH SCREEN */}
       {currentScreen === Screens.FINISH ? 
         <Finish
-        changeScreen={(screen) => setCurrentScreen(screen)}
-        gameID={gameID}
-        playerID={playerID}
-        screenName={name}
-        team={team}/> 
-      : null}
+          changeScreen={(screen) => setCurrentScreen(screen)}
+          gameID={gameID}
+          playerID={playerID}
+          screenName={name}
+          team={team}/> 
+        : null}
 
     </SafeAreaView>
   );
