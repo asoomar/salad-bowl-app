@@ -214,6 +214,14 @@ class Lobby extends Component {
     .catch((error) => console.log(`There was an error starting the game ${this.props.GameID}`))
   }
 
+  getWaitingToJoinText() {
+    if (this.state.players.length < 4) {
+      const playerPlural = this.state.players.length === 3 ? 'player' : 'players'
+      return `Waiting for ${" " + String(4 - this.state.players.length) + " "} more ${playerPlural} to join...`
+    }
+    return null
+  }
+
   render() {
     let playerList = (
       <ScrollView style={styles.playerList}>
@@ -299,7 +307,9 @@ class Lobby extends Component {
           {this.state.currentSegment === 'More' ? morePane : null}
         </View>
         <View style={styles.footer}>
-          {this.state.wordCount < this.state.players.length*2
+          {this.state.players.length < 4 
+          ? <Text style={styles.footerText}>{this.getWaitingToJoinText()}</Text>
+          : this.state.wordCount < this.state.players.length*2
           ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>
           : this.props.playerID === this.state.host.id 
             ? <PrimaryButton
@@ -406,6 +416,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#4b42f5',
     minWidth: '100%',
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   footerText: {
     fontSize: Dimensions.get('screen').height/40,

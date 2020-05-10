@@ -271,7 +271,7 @@ class Game extends Component {
           {this.getRoundText(this.state.round, this.state.isTimerGoing)}
         </Text>  
       : (this.state.isTeamPlaying 
-        ? <Text style={styles.footerText}>It's your team's turn! Try and the word!</Text> 
+        ? <Text style={styles.footerText}>It's your team's turn! Try and guess the word!</Text> 
         : <Text style={styles.footerText}>Waiting for the other team's turn to finish...</Text>)
     
     const team1Style = this.props.team === 0 ? null : styles.opposing
