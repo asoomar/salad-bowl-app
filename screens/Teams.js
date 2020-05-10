@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
+import { isValidSnapshot } from '../global/GlobalFunctions';
 
 class Teams extends Component {
   state = {
@@ -16,6 +17,10 @@ class Teams extends Component {
 
     // Get player list to see the teams
     this.db.getRef(`players/${this.props.gameID}`).on('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 2)) {
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
       let players = Object.entries(snapshot.val());
       let team1Players = [];
       let team2Players = [];
@@ -41,6 +46,10 @@ class Teams extends Component {
 
     //Listen for Host change
     this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 3)) {
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
       let host = Object.entries(snapshot.val())[0];
       this.setState({host: {name: host[1], id: host[0]}});
     });

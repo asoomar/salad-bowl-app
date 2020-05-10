@@ -5,6 +5,7 @@ import Timer from '../components/primitives/Timer';
 import Fire from '../Fire';
 import UserPlaying from '../components/segments/UserPlaying';
 import OpponentPlaying from '../components/segments/OpponentPlaying';
+import { isValidSnapshot } from '../global/GlobalFunctions';
 
 class Game extends Component {
   state = {
@@ -27,6 +28,10 @@ class Game extends Component {
     // Listen for who is currently playing
     this.db.getRef(`games/${this.props.gameID}/currentPlayer`).on('value', (snapshot) => {
       // Assumes there is only 1 object and the first one is the current player
+      if (!isValidSnapshot(snapshot, 4)) {
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
       let currentPlayer = Object.entries(snapshot.val())[0];
       let currentPlayerStateObj = {
         id: currentPlayer[0],
@@ -47,6 +52,10 @@ class Game extends Component {
 
     // Listen for score changes
     this.db.getRef(`games/${this.props.gameID}/score`).on('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 5)) {
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
       let scores = Object.entries(snapshot.val());
       let team1Score = 0;
       let team2Score = 0;
@@ -106,6 +115,10 @@ class Game extends Component {
 
   getAvailableWords() {
     this.db.getRef(`words/${this.props.gameID}`).once('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 6)) {
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
       const allWords = Object.entries(snapshot.val());
       let availableWords = [];
       for (let i = 0; i < allWords.length; i++) {
@@ -149,6 +162,10 @@ class Game extends Component {
       // Get all words and set hasBeenPlayed to false
       this.db.getRef(`games/${this.props.gameID}/round`).set(this.state.round+1);
       this.db.getRef(`words/${this.props.gameID}`).once('value', (snapshot) => {
+        if (!isValidSnapshot(snapshot, 7)) {
+          this.props.changeScreen(Screens.HOME);
+          return
+        }
         let allWords = Object.entries(snapshot.val());
         let updatedWords = {};
         for (let i = 0; i < allWords.length; i++) {
@@ -202,6 +219,10 @@ class Game extends Component {
           turnTime: 60000
         });
         this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
+          if (!isValidSnapshot(snapshot, 8)) {
+            this.props.changeScreen(Screens.HOME);
+            return
+          }
           let players = Object.entries(snapshot.val());
           const opposingTeam = this.props.team === 0 ? 1 : 0;
           let possibleNextPlayers = [];

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
 import Fire from '../Fire';
 import PrimaryButton from '../components/primitives/PrimaryButton';
+import { isValidSnapshot } from '../global/GlobalFunctions';
 
 class Finish extends Component {
   state = {
@@ -14,6 +15,10 @@ class Finish extends Component {
     this.db = Fire.db;
 
     this.db.getRef(`games/${this.props.gameID}/score`).once('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 9)) {
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
       let scores = Object.entries(snapshot.val());
       let team1Pts = 0;
       let team2Pts = 0;
