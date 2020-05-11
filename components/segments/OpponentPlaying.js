@@ -10,6 +10,17 @@ class OpponentPlaying extends Component {
     currentSegment: 'Game'
   }
 
+  getTeamStringFromIndex(index) {
+    switch (index) {
+      case 0: 
+        return "Team 1"
+      case 1:
+        return "Team 2"
+      default:
+        return undefined
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -19,8 +30,17 @@ class OpponentPlaying extends Component {
           onChangeSegment={segment => this.setState({currentSegment: segment})}
         />
         <View style={styles.segmentView}>
-          {this.state.currentSegment === 'Game' ? <GameTab /> : null}
-          {this.state.currentSegment === 'Players' ? <PlayersTab /> : null}
+          {this.state.currentSegment === 'Game' 
+          ? <GameTab 
+              currentPlayer={this.props.currentPlayer}
+              currentTeam={this.getTeamStringFromIndex(this.props.currentTeam)}
+            /> 
+          : null}
+          {this.state.currentSegment === 'Players' 
+          ? <PlayersTab 
+              players={this.props.players}
+            /> 
+          : null}
         </View>
       </View>
     );
@@ -28,7 +48,9 @@ class OpponentPlaying extends Component {
 }
 
 OpponentPlaying.propTypes = {
-
+  players: PropTypes.array.isRequired,
+  currentPlayer: PropTypes.string,
+  currentTeam: PropTypes.number
 }
   
 const styles = StyleSheet.create({

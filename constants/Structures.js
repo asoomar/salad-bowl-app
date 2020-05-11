@@ -1,1 +1,1 @@
-export  const gameIDLength = 5;
+export const gameIDLength = 5;

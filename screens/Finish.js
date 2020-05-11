@@ -34,10 +34,40 @@ class Finish extends Component {
 
   }
 
+  // Delete the game we just left
+  deleteGame() {
+    this.db.getRef(`games/${this.props.gameID}`).remove()
+    .then(()=> {
+      console.log(`Game (${this.props.gameID}) was deleted`);
+    })
+    .catch((error) => 'Game deletion failed: ' + error.message);  
+  }
+
+  // Delete words that are for the current game
+  deleteGameWords() {
+    this.db.getRef(`words/${this.props.gameID}`).remove()
+    .then(()=> {
+      console.log(`Words for game (${this.props.gameID}) were deleted`);
+    })
+    .catch((error) => 'Words deletion failed: ' + error.message); 
+  }
+
+  // Check if we were the last person to leave the game
+  checkIfLastToLeave() {
+    this.db.getRef(`players`).orderByKey().equalTo(this.props.gameID).once('value', (snapshot) => {
+      if (snapshot.val() == null) {
+        console.log(`${this.props.screenName} WAS the last player to leave`);
+        this.deleteGame();
+        this.deleteGameWords();
+      }
+    }); 
+  }
+
   goHome() {
     this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}`).remove()
     .then(()=> {
       console.log(`${this.props.playerID} (${this.props.screenName}) left game`);
+      this.checkIfLastToLeave();
     })
     .catch((error) => 'Failed to leave game: ' + error.message)
     this.props.changeScreen(Screens.HOME);

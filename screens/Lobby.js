@@ -213,7 +213,8 @@ class Lobby extends Component {
           let playerObject = {
             name: gamePlayers[i][1],
             team: teamNumber,
-            hasPlayed: false
+            hasPlayed: false,
+            points: 0,
           }
           playersWithTeams[gamePlayers[i][0]] = playerObject;
         }
@@ -316,9 +317,10 @@ class Lobby extends Component {
           {this.state.currentSegment === 'More' ? morePane : null}
         </View>
         <View style={styles.footer}>
-          {this.state.players.length < 4 
+          {/* {this.state.players.length < 4 
           ? <Text style={styles.footerText}>{this.getWaitingToJoinText()}</Text>
-          : this.state.wordCount < this.state.players.length*2
+          :  */}
+          {this.state.wordCount < this.state.players.length*2
           ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>
           : this.props.playerID === this.state.host.id 
             ? <PrimaryButton

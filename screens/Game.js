@@ -5,6 +5,12 @@ import Timer from '../components/primitives/Timer';
 import Fire from '../Fire';
 import UserPlaying from '../components/segments/UserPlaying';
 import OpponentPlaying from '../components/segments/OpponentPlaying';
+import PrimaryModal from '../components/primitives/PrimaryModal';
+import { 
+  modalContentPlaying, 
+  modalContentWatching,
+  modalTitles,
+ } from '../constants/ModalContent';
 import { isValidSnapshot } from '../global/GlobalFunctions';
 
 class Game extends Component {
@@ -12,6 +18,7 @@ class Game extends Component {
     isPlaying: false,
     isTeamPlaying: false,
     currentPlayer: {},
+    players: [],
     score: {team1: 0, team2: 0},
     words: [{id: '', word: ''}],
     currentWord: {id: '', word: ''},
@@ -19,7 +26,8 @@ class Game extends Component {
     isTimerGoing: false,
     turnStartTimestamp: '',
     turnTime: 60000, //60 seconds by default
-    timeRemaining: 60000 
+    timeRemaining: 60000, 
+    isModalVisible: false,
   }
 
   componentDidMount() {
@@ -61,6 +69,27 @@ class Game extends Component {
       }
     });
 
+    // Listen to players in game (used to see teams and player scores)
+    this.db.getRef(`players/${this.props.gameID}`).on('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 11)) {
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
+      const allPlayers = Object.entries(snapshot.val());
+      let gamePlayers = [];
+      for (let i = 0; i < allPlayers.length; i++) {
+        const suffix = this.props.playerID === allPlayers[i][0] ? ' (You)':''
+        const gamePlayer = {
+          id: allPlayers[i][0],
+          name: allPlayers[i][1].name + suffix,
+          team: allPlayers[i][1].team,
+          points: allPlayers[i][1].points,
+        }
+        gamePlayers.push(gamePlayer)
+      }
+      this.setState({players: gamePlayers})
+    });
+
     // Listen for score changes
     this.db.getRef(`games/${this.props.gameID}/score`).on('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 5)) {
@@ -83,7 +112,7 @@ class Game extends Component {
     // Listen for round change
     this.db.getRef(`games/${this.props.gameID}/round`).on('value', (snapshot) => {
       let roundState = snapshot.val();
-      this.setState({round: roundState});
+      this.setState({round: roundState, isModalVisible: true});
     });
 
     // Listen for turn timestamp
@@ -121,6 +150,7 @@ class Game extends Component {
     this.db.getRef(`games/${this.props.gameID}/turnStartTimestamp`).off();
     this.db.getRef(`games/${this.props.gameID}/turnTime`).off();
     this.db.getRef(`games/${this.props.gameID}/status`).off();
+    this.db.getRef(`players/${this.props.gameID}`).off();
     clearInterval(this.myInterval);
   }
 
@@ -197,6 +227,7 @@ class Game extends Component {
     let newScore = this.state.score[team] + 1;
     this.db.getRef(`games/${this.props.gameID}/score/${team}`).set(newScore);
     this.wordHasBeenPlayed();
+    this.updatePersonalPoints(1);
   }
 
   pass() {
@@ -205,6 +236,16 @@ class Game extends Component {
     let newScore = this.state.score[team] + 1;
     this.db.getRef(`games/${this.props.gameID}/score/${team}`).set(newScore);
     this.wordHasBeenPlayed();
+    this.updatePersonalPoints(-1);
+  }
+
+  async updatePersonalPoints(amt) {
+    try {
+      const score = await this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}/points`).once('value')
+      this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}/points`).set(score.val()+amt);
+    } catch(error) {
+      console.log('Failed to update personal score')
+    }
   }
 
   setTimer(setValue, time) {
@@ -311,6 +352,19 @@ class Game extends Component {
         
     return (
       <View style={styles.container}>
+        <PrimaryModal 
+          title={modalTitles[this.state.round]}
+          modalVisible={this.state.isModalVisible}
+          buttonText={'Okay!'}
+          onCloseModal={() => this.setState({isModalVisible: false})}
+          content={
+            <Text style={styles.modalContent}>
+              {this.state.isPlaying 
+              ? modalContentPlaying[this.state.round]
+              : modalContentWatching[this.state.round]}
+            </Text>
+          }
+        />
         <View style={styles.header}>
           <Text style={styles.title}>Round {this.state.round}</Text>
           <View style={styles.score}>
@@ -338,7 +392,11 @@ class Game extends Component {
               setTimer={(setValue, time) => this.setTimer(setValue,time)}
               round={this.state.round}
             /> 
-          : <OpponentPlaying />}
+          : <OpponentPlaying 
+              currentPlayer={this.state.currentPlayer.name}
+              currentTeam={this.state.currentPlayer.team}
+              players={this.state.players}
+            />}
         </View>
         <View style={styles.footer}>
           {segment} 
@@ -355,6 +413,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  modalContent: {
+    fontSize: Dimensions.get('screen').height/42,
+    fontFamily: 'poppins-semibold',
+    color: '#fff',
+    textAlign: 'center',
   },
   header: {
     flex: 2,

@@ -7,14 +7,20 @@ class GameTab extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>In game info is coming soon!</Text>
+        <Text style={styles.text}>
+          <Text style={styles.colored}>{` ${this.props.currentPlayer} `}</Text>
+          {` from `} 
+          <Text style={styles.colored}>{` ${this.props.currentTeam} `}</Text>
+          {` is currently playing!`} 
+        </Text>
       </View>
     );
   }
 }
 
 GameTab.propTypes = {
-
+  currentPlayer: PropTypes.string,
+  currentTeam: PropTypes.string
 }
   
 const styles = StyleSheet.create({
@@ -32,8 +38,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: Dimensions.get('screen').height/30,
     fontFamily: 'poppins-semibold',
-    color: '#4b42f5',
+    color: '#000',
     textAlign: 'center'
+  },
+  colored: {
+    color: '#4b42f5'
   }
 });
 
