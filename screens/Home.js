@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
-import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
 import PrimaryButton from '../components/primitives/PrimaryButton';
+
+const isTitleImage = true
 
 export default function Home(props) {
     props.setPlayerID('');
@@ -12,7 +14,10 @@ export default function Home(props) {
     return (
       <View style={styles.container}>
         <View style={styles.titleView}>
-          <Text style={styles.title}>SALAD BOWL</Text>
+          {isTitleImage 
+          ? <Image style={styles.image} source={require('../assets/logo.png')} />
+          : <Text style={styles.title}>SALAD BOWL</Text>
+          }
         </View>
         <View style={styles.buttonView}>
           <PrimaryButton 
@@ -37,6 +42,7 @@ export default function Home(props) {
     },
     titleView: {
       flex: 2,
+      alignItems: 'center',
       justifyContent: 'center',
       width: Dimensions.get('screen').width
     },
@@ -48,6 +54,11 @@ export default function Home(props) {
       textShadowOffset: { width: 5, height: 7 },
       textShadowRadius: 1,
       textShadowColor: '#000000cc',
+    },
+    image: {
+      resizeMode: 'contain',
+      width: '90%',
+      maxHeight: Dimensions.get('screen').height*0.5,
     },
     buttonView: {
       flex: 1,

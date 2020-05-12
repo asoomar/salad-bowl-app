@@ -56,9 +56,6 @@ const styles = StyleSheet.create({
   },
   modalBox: {
     backgroundColor: '#4b42f5',
-    // backgroundColor: '#fff',
-    // borderColor: '#4b42f5',
-    // borderWidth: 3,
     minHeight: Dimensions.get('screen').height * 0.8,
     maxHeight: Dimensions.get('screen').height * 0.8,
     minWidth: '90%',

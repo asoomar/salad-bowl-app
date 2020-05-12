@@ -24,7 +24,7 @@ export default function YourWords(props) {
           <Text style={styles.error}>{props.error}</Text>
         </View> 
         <PrimaryTextInput 
-          autoCorrect={false}
+          autoCorrect={true}
           marginBottom={10}
           onChangeText={text => props.onFirstWordChange(text)}
           placeholder={'First Word'}
@@ -33,7 +33,7 @@ export default function YourWords(props) {
           value={props.firstWordValue}
         />
         <PrimaryTextInput 
-          autoCorrect={false}
+          autoCorrect={true}
           onChangeText={text => props.onSecondWordChange(text)}
           placeholder={'Second Word'}
           placeholderTextColor={props.placeholderTextColor}
