@@ -11,6 +11,8 @@ npm-debug.*
 web-build/
 web-report/
 Fire.js
+app.json
+resources/*
 
 # macOS
 .DS_Store

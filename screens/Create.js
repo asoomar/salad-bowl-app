@@ -11,6 +11,7 @@ import BackButton from '../components/primitives/BackButton';
 import rand from 'random-seed';
 import Screens from '../constants/Screens';
 import { gameIDLength } from '../constants/Structures';
+import Events from '../constants/Events';
 import Fire from '../Fire';
 
 class Create extends Component {
@@ -67,6 +68,10 @@ class Create extends Component {
     while (await this.isNotValidGameID(newGameID)) {
       newGameID = this.makeGameID(gameIDLength);
     }
+    this.db.logEvent(Events.CREATE_GAME, {
+      screen: 'create',
+      purpose: 'Create new game'
+    })
     let gameRef = this.db.getRef('games');
     gameRef.child(newGameID).set({ 
       'timestamp': Date.now(),
