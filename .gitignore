@@ -10,7 +10,6 @@ npm-debug.*
 *.orig.*
 web-build/
 web-report/
-Fire.js
 app.json
 resources/*
 
