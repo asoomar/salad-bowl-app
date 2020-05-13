@@ -120,7 +120,13 @@ class Create extends Component {
         </View>
         <View style={styles.backButtonView}>
           <BackButton 
-            onPress={()=>this.props.changeScreen(Screens.HOME)}
+            onPress={()=> {
+              this.db.logEvent(Events.BACK_BUTTON, {
+                screen: 'create',
+                purpose: 'User on create page clicked to go back to lobby'
+              })
+              this.props.changeScreen(Screens.HOME)
+            }}
             margin={Dimensions.get('screen').width/15}
           />
         </View>

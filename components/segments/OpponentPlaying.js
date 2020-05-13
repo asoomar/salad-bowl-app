@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
 import SegmentSelector from '../primitives/SegmentSelector';
 import GameTab from '../segments/GameTab';
 import PlayersTab from '../segments/PlayersTab';
+import Events from '../../constants/Events';
+import Fire from '../../Fire';
 import PropTypes from 'prop-types';
 
 class OpponentPlaying extends Component {
@@ -27,7 +29,14 @@ class OpponentPlaying extends Component {
         <SegmentSelector 
           segments={['Game', 'Players']}
           currentSegment={this.state.currentSegment}
-          onChangeSegment={segment => this.setState({currentSegment: segment})}
+          onChangeSegment={segment => {
+            Fire.db.logEvent(Events.SWITCH_TAB, {
+              tab: segment,
+              screen: 'game',
+              purpose: 'Tab was switched in game'
+            })
+            this.setState({currentSegment: segment})
+          }}
         />
         <View style={styles.segmentView}>
           {this.state.currentSegment === 'Game' 

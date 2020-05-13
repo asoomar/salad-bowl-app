@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
 import PrimaryButton from '../primitives/PrimaryButton';
+import Events from '../../constants/Events';
+import Fire from '../../Fire';
 import PropTypes from 'prop-types';
 
 const ROUND_STRINGS = {
@@ -59,7 +61,13 @@ class UserPlaying extends Component {
             </View> 
           : <PrimaryButton 
               text="Start" 
-              onPress={()=>this.props.setTimer(true, Date.now())}
+              onPress={()=>{
+                this.props.setTimer(true, Date.now())
+                Fire.db.logEvent(Events.START_ROUND, {
+                  screen: 'game',
+                  purpose: 'User started round',
+                })
+              }}
               buttonStyle={styles.startButton}
               textStyle={styles.startButtonText}
             />

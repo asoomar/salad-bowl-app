@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
+import Events from '../constants/Events';
 import Fire from '../Fire';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import { isValidSnapshot } from '../global/GlobalFunctions';
@@ -64,6 +65,10 @@ class Finish extends Component {
   }
 
   goHome() {
+    this.db.logEvent(Events.GO_HOME, {
+      screen: 'finish',
+      purpose: 'Game ended and user clicked to go home',
+    })
     this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}`).remove()
     .then(()=> {
       console.log(`${this.props.playerID} (${this.props.screenName}) left game`);

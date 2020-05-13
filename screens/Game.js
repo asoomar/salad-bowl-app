@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
 import Timer from '../components/primitives/Timer';
+import Events from '../constants/Events';
 import Fire from '../Fire';
 import UserPlaying from '../components/segments/UserPlaying';
 import OpponentPlaying from '../components/segments/OpponentPlaying';
@@ -35,7 +36,7 @@ class Game extends Component {
 
     // Set team if it was not already set
     if (this.props.team !== 0 && this.props.team !== 1) {
-      this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}/team`).on('value', (snapshot) => {
+      this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}/team`).once('value', (snapshot) => {
         if (!isValidSnapshot(snapshot, 10)) {
           this.props.changeScreen(Screens.HOME);
           return
@@ -222,6 +223,10 @@ class Game extends Component {
   }
 
   nextWord() {
+    this.db.logEvent(Events.NEXT_WORD, {
+      screen: 'game',
+      purpose: 'User clicked next button to get the next word',
+    })
     // Increment user team's score
     let team = this.getTeam(this.props.team);
     let newScore = this.state.score[team] + 1;
@@ -231,6 +236,10 @@ class Game extends Component {
   }
 
   pass() {
+    this.db.logEvent(Events.PASS_WORD, {
+      screen: 'game',
+      purpose: 'User clicked pass button to forfeit word',
+    })
     // Increment opposing team's score
     let team = this.getTeam(this.props.team) === "team1" ? "team2" : "team1";
     let newScore = this.state.score[team] + 1;

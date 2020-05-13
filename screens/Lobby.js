@@ -5,6 +5,7 @@ import PrimaryButton from '../components/primitives/PrimaryButton';
 import YourWords from '../components/segments/YourWords';
 import Screens from '../constants/Screens';
 import { isValidSnapshot } from '../global/GlobalFunctions';
+import Events from '../constants/Events';
 import Fire from '../Fire';
 import _ from 'lodash';
 
@@ -80,6 +81,11 @@ class Lobby extends Component {
   }
 
   async goHome() {
+    this.db.logEvent(Events.LEAVE_GAME, {
+      screen: 'lobby',
+      purpose: 'Leave game button was clicked',
+    })
+
     // Remove player from player list for game
     this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}`).remove()
     .then(()=> {
@@ -155,9 +161,19 @@ class Lobby extends Component {
     for (let i = 0; i < this.state.words.length; i++) {
       if (this.state.words[i].word.trim() === '') {
         this.setState({error: "Cannot submit invalid words"});
+        this.db.logEvent(Events.SUBMIT_WORDS, {
+          screen: 'lobby',
+          purpose: 'Submit words button was clicked',
+          status: 'invalid'
+        })
         return;
       }
     }
+    this.db.logEvent(Events.SUBMIT_WORDS, {
+      screen: 'lobby',
+      purpose: 'Submit words button was clicked',
+      status: 'valid'
+    })
     this.setState({error: ''});
     if (this.state.words[0].key !== '') { // Update words in database
       for (let i = 0; i < this.state.words.length; i++) {
@@ -197,6 +213,10 @@ class Lobby extends Component {
   }
 
   startGame() {
+    this.db.logEvent(Events.START_GAME, {
+      screen: 'lobby',
+      purpose: 'Start game to proceed to team distribution',
+    })
     this.db.getRef(`games/${this.props.gameID}/status`).set(Screens.TEAMS)
     .then(() => {
       console.log(`Setting up teams for game ${this.props.gameID}`);
@@ -275,7 +295,12 @@ class Lobby extends Component {
           })}
           <PrimaryButton 
             text='Edit Words'
-            onPress={() => this.setState({editWords: true})}
+            onPress={() => {
+              this.db.logEvent(Events.EDIT_WORDS, {
+                screen: 'lobby',
+                purpose: 'Edit words button was clicked'
+              })
+              this.setState({editWords: true})}}
             buttonStyle={styles.editButton}
             textStyle={styles.editButtonText}
           />
@@ -309,7 +334,14 @@ class Lobby extends Component {
         <SegmentSelector
             segments={['Your Words', 'Players', 'More']}
             currentSegment={this.state.currentSegment}
-            onChangeSegment={segment => this.setState({currentSegment: segment})}
+            onChangeSegment={segment => {
+              this.db.logEvent(Events.SWITCH_TAB, {
+                tab: segment,
+                screen: 'lobby',
+                purpose: 'Tab was switched in lobby'
+              })
+              this.setState({currentSegment: segment})
+            }}
           />
         <View style={styles.body}>
           {this.state.currentSegment === 'Your Words' ? yourWords : null}
@@ -317,10 +349,9 @@ class Lobby extends Component {
           {this.state.currentSegment === 'More' ? morePane : null}
         </View>
         <View style={styles.footer}>
-          {/* {this.state.players.length < 4 
+          {this.state.players.length < 4 
           ? <Text style={styles.footerText}>{this.getWaitingToJoinText()}</Text>
-          :  */}
-          {this.state.wordCount < this.state.players.length*2
+          : this.state.wordCount < this.state.players.length*2
           ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>
           : this.props.playerID === this.state.host.id 
             ? <PrimaryButton

@@ -5,6 +5,7 @@ import PrimaryButton from '../components/primitives/PrimaryButton';
 import BackButton from '../components/primitives/BackButton';''
 import Screens from '../constants/Screens';
 import { gameIDLength } from '../constants/Structures';
+import Events from '../constants/Events';
 import Fire from '../Fire';
 
 class Join extends Component {
@@ -51,6 +52,10 @@ class Join extends Component {
       this.setState({error: `Game ID should be ${gameIDLength} characters`});
       return
     }
+    this.db.logEvent(Events.JOIN_GAME, {
+      screen: 'join',
+      purpose: 'User entered details and clicked "Join"'
+    })
     if (await this.canUserJoinGame(gameID)) {
       this.props.updateName(this.state.name.trim());
       this.props.updateGameID(gameID);
@@ -87,7 +92,13 @@ class Join extends Component {
         </View>
         <View style={styles.backButtonView}>
           <BackButton 
-            onPress={()=>this.props.changeScreen(Screens.HOME)}
+            onPress={()=> {
+              this.db.logEvent(Events.BACK_BUTTON, {
+                screen: 'join',
+                purpose: 'User on join page clicked to go back to lobby'
+              })
+              this.props.changeScreen(Screens.HOME)
+            }}
             margin={Dimensions.get('screen').width/15}
           />
         </View>

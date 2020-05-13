@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import Screens from '../constants/Screens';
+import Events from '../constants/Events';
 import Fire from '../Fire';
 import { isValidSnapshot } from '../global/GlobalFunctions';
 
@@ -78,6 +79,10 @@ class Teams extends Component {
   }
 
   startGame() {
+    this.db.logEvent(Events.START_GAME, {
+      screen: 'teams',
+      purpose: 'Start game to proceed to game',
+    })
     const { team1 } = this.state
     const playerIndex = Math.floor(Math.random(0, team1.length));
     const currentPlayerObj = {
