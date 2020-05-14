@@ -10,7 +10,8 @@ PrimaryTextInput.propTypes = {
   placeholder: PropTypes.string,
   marginBottom: PropTypes.number,
   style: PropTypes.object,
-  placeholderTextColor: PropTypes.string
+  placeholderTextColor: PropTypes.string,
+  keyboardType: PropTypes.string
 }
 
 export default function PrimaryTextInput(props) {
@@ -26,6 +27,7 @@ export default function PrimaryTextInput(props) {
       onChangeText={text=>props.onChangeText(text)}
       placeholder={props.placeholder}
       placeholderTextColor={props.placeholderTextColor || `#342bcf`}
+      keyboardType={props.keyboardType}
       value={props.value}
     />
   )
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: Dimensions.get('screen').height/25,
+    fontSize: Dimensions.get('screen').height/30,
     fontFamily: 'poppins-semibold',
     textAlign: 'center'
   }

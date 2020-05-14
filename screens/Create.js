@@ -17,6 +17,7 @@ import Fire from '../Fire';
 class Create extends Component {
   state = {
     name: '',
+    wordCount: '',
     error: ''
   }
 
@@ -58,12 +59,26 @@ class Create extends Component {
     this.setState({name: updatedName});
   }
 
+  updateWordCount(updateWordCount) {
+    this.setState({wordCount: updateWordCount});
+  }
+
   async pressSubmit() {
     Keyboard.dismiss();
     if (this.state.name.trim() < 1) {
       this.setState({error: `You must enter a name`});
       return
+    } else if (isNaN(Number(this.state.wordCount))) {
+      this.setState({error: `Words per person must be a number`});
+      return
+    } else if (Number(this.state.wordCount) < 1) {
+      this.setState({error: `Words per person must be at least 1`});
+      return
+    } else if (Number(this.state.wordCount) > 10) {
+      this.setState({error: `Words per person can't be more than 10`});
+      return
     }
+
     let newGameID = this.makeGameID(gameIDLength);
     while (await this.isNotValidGameID(newGameID)) {
       newGameID = this.makeGameID(gameIDLength);
@@ -76,6 +91,7 @@ class Create extends Component {
     gameRef.child(newGameID).set({ 
       'timestamp': Date.now(),
       'round': '',
+      'wordsPerPerson': Number(this.state.wordCount),
       'status': Screens.LOBBY,
       'currentPlayer': '',
       'turnStartTimestamp': '',
@@ -109,9 +125,17 @@ class Create extends Component {
           </View>
           <PrimaryTextInput 
             autoCorrect={false}
+            marginBottom={10}
             onChangeText={text=>this.updateName(text)}
             placeholder={'Your Name'}
             value={this.state.name}
+          />
+          <PrimaryTextInput 
+            autoCorrect={false}
+            keyboardType={'number-pad'}
+            onChangeText={text=>this.updateWordCount(text)}
+            placeholder={'Words Per Person'}
+            value={this.state.wordCount}
           />
           <PrimaryButton
             text={'Create'}

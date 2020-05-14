@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, TextInput, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
 import PrimaryTextInput from '../primitives/PrimaryTextInput';
 import PrimaryButton from '../primitives/PrimaryButton';
+import NumberRanks from '../../constants/NumberRanks';
 import PropTypes from 'prop-types';
 
 YourWords.propTypes = {
-  firstWordValue: PropTypes.string.isRequired,
-  secondWordValue: PropTypes.string.isRequired,
-  onFirstWordChange: PropTypes.func.isRequired,
-  onSecondWordChange: PropTypes.func.isRequired,
+  wordsPerPlayer: PropTypes.number.isRequired,
+  words: PropTypes.array.isRequired,
+  onWordChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   error: PropTypes.string,
   style: PropTypes.object,
@@ -17,35 +17,32 @@ YourWords.propTypes = {
 
 export default function YourWords(props) {
   return (
-    <View style={styles.container}>
+    <ScrollView>
       <View style={styles.mainView}>
-        {/* THIS ERROR HAS TO HAVE PROPER UI */}
+        {props.words.map((wordObject,i) => {
+          if (i < props.wordsPerPlayer) {
+            return (
+              <PrimaryTextInput 
+                key={NumberRanks[i]}
+                autoCorrect={true}
+                marginBottom={10}
+                onChangeText={text => props.onWordChange(text, i)}
+                placeholder={`${NumberRanks[i]} Word`}
+                placeholderTextColor={props.placeholderTextColor}
+                style={props.style}
+                value={wordObject.word}
+              />
+            )}
+        })}
         <View style={styles.errorBox}>
           <Text style={styles.error}>{props.error}</Text>
         </View> 
-        <PrimaryTextInput 
-          autoCorrect={true}
-          marginBottom={10}
-          onChangeText={text => props.onFirstWordChange(text)}
-          placeholder={'First Word'}
-          placeholderTextColor={props.placeholderTextColor}
-          style={props.style}
-          value={props.firstWordValue}
-        />
-        <PrimaryTextInput 
-          autoCorrect={true}
-          onChangeText={text => props.onSecondWordChange(text)}
-          placeholder={'Second Word'}
-          placeholderTextColor={props.placeholderTextColor}
-          style={props.style}
-          value={props.secondWordValue}
-        />
         <PrimaryButton
           text={'Submit Words'}
           onPress={() => props.onSubmit()}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 }
   
@@ -56,6 +53,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
+    paddingTop: 10,
   },
   errorBox: {
     height: Dimensions.get('screen').height/25,
@@ -66,5 +64,6 @@ const styles = StyleSheet.create({
   error: {
     fontSize: Dimensions.get('screen').height/55,
     fontFamily: 'poppins-semibold',
+    color: 'red',
   }
 });
