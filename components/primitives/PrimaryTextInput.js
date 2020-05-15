@@ -9,14 +9,16 @@ PrimaryTextInput.propTypes = {
   autoCapitalize: PropTypes.string,
   placeholder: PropTypes.string,
   marginBottom: PropTypes.number,
+  marginTop: PropTypes.number,
   style: PropTypes.object,
   placeholderTextColor: PropTypes.string,
-  keyboardType: PropTypes.string
+  keyboardType: PropTypes.string,
 }
 
 export default function PrimaryTextInput(props) {
   let viewStyling = {}
   if (props.marginBottom) viewStyling.marginBottom = props.marginBottom
+  if (props.marginTop) viewStyling.marginTop = props.marginTop
 
   return(
     <TextInput

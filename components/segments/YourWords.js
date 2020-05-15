@@ -1,9 +1,57 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
+import ReactNative, { 
+  StyleSheet, 
+  Text, 
+  View, 
+  ScrollView, 
+  Dimensions, 
+  KeyboardAvoidingView 
+} from 'react-native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PrimaryTextInput from '../primitives/PrimaryTextInput';
 import PrimaryButton from '../primitives/PrimaryButton';
 import NumberRanks from '../../constants/NumberRanks';
 import PropTypes from 'prop-types';
+
+class YourWords extends Component {
+
+  render() {
+    return (
+      <KeyboardAwareScrollView 
+        // keyboardOpeningTime={0}
+        enableResetScrollToCoords={false}
+        // keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.mainView}>
+          {this.props.words.map((wordObject,i) => {
+            if (i < this.props.wordsPerPlayer) {
+              return (
+                <PrimaryTextInput 
+                  key={NumberRanks[i]}
+                  autoCorrect={true}
+                  marginTop={10}
+                  onChangeText={text => this.props.onWordChange(text, i)}
+                  placeholder={`${NumberRanks[i]} Word`}
+                  placeholderTextColor={this.props.placeholderTextColor}
+                  style={this.props.style}
+                  value={wordObject.word}
+                />
+              )}
+          })}
+          <View style={styles.errorBox}>
+            <Text style={styles.error}>{this.props.error}</Text>
+          </View> 
+          <PrimaryButton
+            text={'Submit Words'}
+            onPress={() => this.props.onSubmit()}
+            buttonStyle={styles.submitButton}
+            textStyle={styles.submitButtonText}
+          />
+        </View>
+      </KeyboardAwareScrollView>
+    );
+  }
+}
 
 YourWords.propTypes = {
   wordsPerPlayer: PropTypes.number.isRequired,
@@ -12,38 +60,8 @@ YourWords.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   error: PropTypes.string,
   style: PropTypes.object,
-  placeholderTextColor: PropTypes.string
-}
-
-export default function YourWords(props) {
-  return (
-    <ScrollView>
-      <View style={styles.mainView}>
-        {props.words.map((wordObject,i) => {
-          if (i < props.wordsPerPlayer) {
-            return (
-              <PrimaryTextInput 
-                key={NumberRanks[i]}
-                autoCorrect={true}
-                marginBottom={10}
-                onChangeText={text => props.onWordChange(text, i)}
-                placeholder={`${NumberRanks[i]} Word`}
-                placeholderTextColor={props.placeholderTextColor}
-                style={props.style}
-                value={wordObject.word}
-              />
-            )}
-        })}
-        <View style={styles.errorBox}>
-          <Text style={styles.error}>{props.error}</Text>
-        </View> 
-        <PrimaryButton
-          text={'Submit Words'}
-          onPress={() => props.onSubmit()}
-        />
-      </View>
-    </ScrollView>
-  );
+  placeholderTextColor: PropTypes.string,
+  footerHeight: PropTypes.number
 }
   
 const styles = StyleSheet.create({
@@ -53,7 +71,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 10,
   },
   errorBox: {
     height: Dimensions.get('screen').height/25,
@@ -65,5 +82,16 @@ const styles = StyleSheet.create({
     fontSize: Dimensions.get('screen').height/55,
     fontFamily: 'poppins-semibold',
     color: 'red',
-  }
+  },
+  submitButton: {
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#4b42f5',
+    // marginTop: 5
+  },
+  submitButtonText: {
+    color: '#4b42f5',
+  },
 });
+
+export default YourWords;

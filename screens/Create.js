@@ -4,7 +4,8 @@ import {
   Text, 
   View,  
   Dimensions, 
-  Keyboard} from 'react-native';
+  Keyboard,
+  TouchableWithoutFeedback} from 'react-native';
 import PrimaryTextInput from '../components/primitives/PrimaryTextInput';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import BackButton from '../components/primitives/BackButton';
@@ -117,44 +118,46 @@ class Create extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.mainView}>
-          <Text style={styles.title}>Create Game</Text>
-          <View style={styles.errorBox}>
-            <Text style={styles.error}>{this.state.error}</Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <View style={styles.mainView}>
+            <Text style={styles.title}>Create Game</Text>
+            <View style={styles.errorBox}>
+              <Text style={styles.error}>{this.state.error}</Text>
+            </View>
+            <PrimaryTextInput 
+              autoCorrect={false}
+              marginBottom={10}
+              onChangeText={text=>this.updateName(text)}
+              placeholder={'Your Name'}
+              value={this.state.name}
+            />
+            <PrimaryTextInput 
+              autoCorrect={false}
+              keyboardType={'number-pad'}
+              onChangeText={text=>this.updateWordCount(text)}
+              placeholder={'Words Per Person'}
+              value={this.state.wordCount}
+            />
+            <PrimaryButton
+              text={'Create'}
+              onPress={()=>this.pressSubmit()}
+            />
           </View>
-          <PrimaryTextInput 
-            autoCorrect={false}
-            marginBottom={10}
-            onChangeText={text=>this.updateName(text)}
-            placeholder={'Your Name'}
-            value={this.state.name}
-          />
-          <PrimaryTextInput 
-            autoCorrect={false}
-            keyboardType={'number-pad'}
-            onChangeText={text=>this.updateWordCount(text)}
-            placeholder={'Words Per Person'}
-            value={this.state.wordCount}
-          />
-          <PrimaryButton
-            text={'Create'}
-            onPress={()=>this.pressSubmit()}
-          />
+          <View style={styles.backButtonView}>
+            <BackButton 
+              onPress={()=> {
+                this.db.logEvent(Events.BACK_BUTTON, {
+                  screen: 'create',
+                  purpose: 'User on create page clicked to go back to lobby'
+                })
+                this.props.changeScreen(Screens.HOME)
+              }}
+              margin={Dimensions.get('screen').width/15}
+            />
+          </View>
         </View>
-        <View style={styles.backButtonView}>
-          <BackButton 
-            onPress={()=> {
-              this.db.logEvent(Events.BACK_BUTTON, {
-                screen: 'create',
-                purpose: 'User on create page clicked to go back to lobby'
-              })
-              this.props.changeScreen(Screens.HOME)
-            }}
-            margin={Dimensions.get('screen').width/15}
-          />
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }

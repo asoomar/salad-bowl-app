@@ -32,7 +32,7 @@ class Lobby extends Component {
     ],
     wordCount: 0,
     wordsPerPlayer: 2, // Default if words per player is not set
-    currentSegment: 'Your Words'
+    currentSegment: 'Your Words',
   }
 
   componentDidMount() {
@@ -302,6 +302,7 @@ class Lobby extends Component {
         error={this.state.error}
         style={styles.textInput}
         placeholderTextColor='#dddddd'
+        footerHeight={Dimensions.get('screen').height/7}
         />
       : (
         <ScrollView>
