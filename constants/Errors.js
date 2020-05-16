@@ -10,7 +10,8 @@ const Errors = {
   [8]: "Snapshot to retrieve players for next round is invalid",
   [9]: "Snapshot to retrieve scores in finish screen is invalid",
   [10]: "Snapshot for getting user's own team is not valid in game screen",
-  [11]: "Snapshot listening for players to update scores in game screen is not valid"
+  [11]: "Snapshot listening for players to update scores in game screen is not valid",
+  [12]: "Snapshot to get words per player is invalid"
 }
 
 export default Errors

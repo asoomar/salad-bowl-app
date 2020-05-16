@@ -4,6 +4,7 @@ import SegmentSelector from '../components/primitives/SegmentSelector';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import YourWords from '../components/segments/YourWords';
 import Screens from '../constants/Screens';
+import NumberRanks from '../constants/NumberRanks';
 import { isValidSnapshot } from '../global/GlobalFunctions';
 import Events from '../constants/Events';
 import Fire from '../Fire';
@@ -16,9 +17,22 @@ class Lobby extends Component {
     host: {name: null, id: null},
     players: [['','']],
     waitingPlayerKeys: [],
-    words: [{key: '', word: ''}, {key: '', word: ''}],
+    // Max of 10 words per player
+    words: [
+      {key: '', word: ''},
+      {key: '', word: ''}, 
+      {key: '', word: ''}, 
+      {key: '', word: ''},
+      {key: '', word: ''},
+      {key: '', word: ''},
+      {key: '', word: ''},
+      {key: '', word: ''},
+      {key: '', word: ''},
+      {key: '', word: ''}
+    ],
     wordCount: 0,
-    currentSegment: 'Your Words'
+    wordsPerPlayer: 2, // Default if words per player is not set
+    currentSegment: 'Your Words',
   }
 
   componentDidMount() {
@@ -33,6 +47,14 @@ class Lobby extends Component {
         this.db.getRef(`games/${this.props.gameID}/waiting/${value.key}`).set(this.props.screenName);
       });
     }
+
+    // Get words per player
+    this.db.getRef(`games/${this.props.gameID}/wordsPerPerson`).once('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 12)) return
+      if (typeof snapshot.val() === 'number') {
+        this.setState({ wordsPerPlayer: snapshot.val()})
+      }
+    })
 
     //Listen for Host change
     this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
@@ -158,9 +180,9 @@ class Lobby extends Component {
   }
 
   submitWords() {
-    for (let i = 0; i < this.state.words.length; i++) {
+    for (let i = 0; i < this.state.wordsPerPlayer; i++) {
       if (this.state.words[i].word.trim() === '') {
-        this.setState({error: "Cannot submit invalid words"});
+        this.setState({error: "Ensure all words are filled"});
         this.db.logEvent(Events.SUBMIT_WORDS, {
           screen: 'lobby',
           purpose: 'Submit words button was clicked',
@@ -176,7 +198,7 @@ class Lobby extends Component {
     })
     this.setState({error: ''});
     if (this.state.words[0].key !== '') { // Update words in database
-      for (let i = 0; i < this.state.words.length; i++) {
+      for (let i = 0; i < this.state.wordsPerPlayer; i++) {
         this.db.getRef(`words/${this.props.gameID}/${this.state.words[i].key}`)
         .update({
           word: this.state.words[i].word.trim().toUpperCase()
@@ -184,7 +206,7 @@ class Lobby extends Component {
       }
     } else { // Add words to database
       let gameWordsRef = this.db.getRef('words/' + this.props.gameID);
-      for (let i = 0; i < this.state.words.length; i++) {
+      for (let i = 0; i < this.state.wordsPerPlayer; i++) {
         let wordRef = gameWordsRef.push({
           word: this.state.words[i].word.trim().toUpperCase(),
           hasBeenPlayed: false
@@ -273,38 +295,40 @@ class Lobby extends Component {
 
     let yourWords = this.state.editWords
       ? <YourWords 
-        firstWordValue={this.state.words[0].word}
-        secondWordValue={this.state.words[1].word}
-        onFirstWordChange={text => this.updateWord(text, 0)}
-        onSecondWordChange={text => this.updateWord(text, 1)}
+        words={this.state.words}
+        wordsPerPlayer={this.state.wordsPerPlayer}
+        onWordChange={(text, wordNum) => this.updateWord(text, wordNum)}
         onSubmit={() => this.submitWords()}
         error={this.state.error}
         style={styles.textInput}
         placeholderTextColor='#dddddd'
+        footerHeight={Dimensions.get('screen').height/7}
         />
       : (
-        <View style={styles.myWords}>
-          {this.state.words.map((wordObject) => {
-            return (
-            <Text 
-              key={wordObject.key}
-              style={styles.myWord}
-            >
-              {wordObject.word}
-            </Text>)
-          })}
-          <PrimaryButton 
-            text='Edit Words'
-            onPress={() => {
-              this.db.logEvent(Events.EDIT_WORDS, {
-                screen: 'lobby',
-                purpose: 'Edit words button was clicked'
-              })
-              this.setState({editWords: true})}}
-            buttonStyle={styles.editButton}
-            textStyle={styles.editButtonText}
-          />
-        </View>
+        <ScrollView>
+          <View style={styles.myWords}>
+            {this.state.words.map((wordObject,i) => {
+              return (
+              <Text 
+                key={NumberRanks[i]}
+                style={styles.myWord}
+              >
+                {wordObject.word}
+              </Text>)
+            })}
+            <PrimaryButton 
+              text='Edit Words'
+              onPress={() => {
+                this.db.logEvent(Events.EDIT_WORDS, {
+                  screen: 'lobby',
+                  purpose: 'Edit words button was clicked'
+                })
+                this.setState({editWords: true})}}
+              buttonStyle={styles.editButton}
+              textStyle={styles.editButtonText}
+            />
+          </View>
+        </ScrollView>
       )
     
     let morePane = (
@@ -317,7 +341,9 @@ class Lobby extends Component {
         />
       </View>
     )
-
+    
+    const playerPlural = this.state.players.length === 1
+      ? 'player' : 'players'
 
     return (
       <View style={styles.container}>
@@ -325,10 +351,10 @@ class Lobby extends Component {
           <Text style={styles.title}>Lobby</Text> 
           <Text style={styles.subtitle}>Game ID is {this.props.gameID}</Text> 
           <Text style={styles.minititle}>
-            {this.state.wordCount}/{this.state.players.length*2} words
+            {this.state.wordCount}/{this.state.players.length*this.state.wordsPerPlayer} words
           </Text>
           <Text style={styles.minititle}>
-            {this.state.players.length} players
+            {`${this.state.players.length} ${playerPlural}`}
           </Text>
         </View>
         <SegmentSelector
@@ -351,7 +377,7 @@ class Lobby extends Component {
         <View style={styles.footer}>
           {this.state.players.length < 4 
           ? <Text style={styles.footerText}>{this.getWaitingToJoinText()}</Text>
-          : this.state.wordCount < this.state.players.length*2
+          : this.state.wordCount < this.state.players.length*this.state.wordsPerPlayer
           ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>
           : this.props.playerID === this.state.host.id 
             ? <PrimaryButton
