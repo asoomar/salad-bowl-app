@@ -13,6 +13,10 @@ PrimaryTextInput.propTypes = {
   style: PropTypes.object,
   placeholderTextColor: PropTypes.string,
   keyboardType: PropTypes.string,
+  onFocus: PropTypes.func,
+  returnKeyType: PropTypes.string,
+  onSubmitEditing: PropTypes.func,
+  focus: PropTypes.bool,
 }
 
 export default function PrimaryTextInput(props) {
@@ -26,10 +30,14 @@ export default function PrimaryTextInput(props) {
       autoCompleteType={"off"}
       autoCorrect={props.autoCorrect}
       autoCapitalize={props.autoCapitalize}
+      focus={props.focus ? props.focus : undefined}
       onChangeText={text=>props.onChangeText(text)}
+      onFocus={props.onFocus ? () => props.onFocus() : () => {}}
+      onSubmitEditing={props.onSubmitEditing ? () => props.onSubmitEditing() : () => {}}
       placeholder={props.placeholder}
       placeholderTextColor={props.placeholderTextColor || `#342bcf`}
       keyboardType={props.keyboardType}
+      returnKeyType={props.returnKeyType ? props.returnKeyType : 'default'}
       value={props.value}
     />
   )

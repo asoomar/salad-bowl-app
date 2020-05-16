@@ -292,11 +292,17 @@ class Game extends Component {
           for (let i =0; i < players.length; i++) {
             if (players[i][1].team === opposingTeam) {
               opposingTeamPlayers[players[i][0]] =
-               {name: players[i][1].name, team: players[i][1].team};
+               {name: players[i][1].name, 
+                team: players[i][1].team, 
+                points: players[i][1].points};
 
               if (players[i][1].hasPlayed === false) {
                 possibleNextPlayers.push({
-                  [players[i][0]]: {name: players[i][1].name, team: players[i][1].team}
+                  [players[i][0]]: {
+                    name: players[i][1].name, 
+                    team: players[i][1].team,
+                    points: players[i][1].points
+                  }
                 })
               }
             }
@@ -311,7 +317,8 @@ class Game extends Component {
             let randVal = Math.floor(Math.random(0, keys.length));
             nextPlayer = {[keys[randVal]]: {
               name: opposingTeamPlayers[keys[randVal]].name,
-              team: opposingTeamPlayers[keys[randVal]].team
+              team: opposingTeamPlayers[keys[randVal]].team,
+              points: opposingTeamPlayers[keys[randVal]].points
             }}
             opposingTeamPlayers[keys[randVal]].hasPlayed = true;
             console.log('Resetting opposing teams hasPlayed...');

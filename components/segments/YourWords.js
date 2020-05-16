@@ -5,7 +5,7 @@ import ReactNative, {
   View, 
   ScrollView, 
   Dimensions, 
-  KeyboardAvoidingView 
+  Keyboard
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import PrimaryTextInput from '../primitives/PrimaryTextInput';
@@ -14,13 +14,31 @@ import NumberRanks from '../../constants/NumberRanks';
 import PropTypes from 'prop-types';
 
 class YourWords extends Component {
+  state = {
+    currentFocus: null
+  }
+
+  onInputFocus(i) {
+    if (this.state.currentFocus === null) {
+      this.setState({ currentFocus: i })
+    } else if (this.state.currentFocus !== i) {
+      Keyboard.dismiss()
+      this.setState({ currentFocus: null })
+    }
+  }
+
+  // onSubmitInput(i) {
+  //   if (i < this.props.wordsPerPlayer - 1) {
+  //     this.setState({ currentFocus: i + 1 })
+  //   }
+  // }
 
   render() {
     return (
       <KeyboardAwareScrollView 
         // keyboardOpeningTime={0}
-        enableResetScrollToCoords={false}
-        // keyboardShouldPersistTaps="handled"
+        enableResetScrollToCoords={true}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={styles.mainView}>
           {this.props.words.map((wordObject,i) => {
@@ -30,9 +48,13 @@ class YourWords extends Component {
                   key={NumberRanks[i]}
                   autoCorrect={true}
                   marginTop={10}
+                  onFocus={()=>this.onInputFocus(i)}
                   onChangeText={text => this.props.onWordChange(text, i)}
+                  onSubmitEditing={() => this.setState({ currentFocus: null })}
                   placeholder={`${NumberRanks[i]} Word`}
                   placeholderTextColor={this.props.placeholderTextColor}
+                  // returnKeyType={i < this.props.wordsPerPlayer - 1 ? 'next' : 'default'}
+                  returnKeyType='default'
                   style={this.props.style}
                   value={wordObject.word}
                 />
