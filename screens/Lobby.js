@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, StrictMode} from 'react';
 import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
 import SegmentSelector from '../components/primitives/SegmentSelector';
 import PrimaryButton from '../components/primitives/PrimaryButton';
@@ -7,8 +7,11 @@ import Screens from '../constants/Screens';
 import NumberRanks from '../constants/NumberRanks';
 import { isValidSnapshot } from '../global/GlobalFunctions';
 import Events from '../constants/Events';
+import { DEV } from '../constants/Mode';
 import Fire from '../Fire';
 import _ from 'lodash';
+
+const playerMinLimit = DEV ? 2 : 4  
 
 class Lobby extends Component {
   state = {
@@ -267,9 +270,9 @@ class Lobby extends Component {
   }
 
   getWaitingToJoinText() {
-    if (this.state.players.length < 4) {
-      const playerPlural = this.state.players.length === 3 ? 'player' : 'players'
-      return `Waiting for ${" " + String(4 - this.state.players.length) + " "} more ${playerPlural} to join...`
+    if (this.state.players.length < playerMinLimit) {
+      const playerPlural = (playerMinLimit - this.state.players.length) === 1 ? 'player' : 'players'
+      return `Waiting for ${" " + String(playerMinLimit - this.state.players.length) + " "} more ${playerPlural} to join...`
     }
     return null
   }
@@ -375,7 +378,7 @@ class Lobby extends Component {
           {this.state.currentSegment === 'More' ? morePane : null}
         </View>
         <View style={styles.footer}>
-          {this.state.players.length < 4 
+          {this.state.players.length < playerMinLimit
           ? <Text style={styles.footerText}>{this.getWaitingToJoinText()}</Text>
           : this.state.wordCount < this.state.players.length*this.state.wordsPerPlayer
           ? <Text style={styles.footerText}>Waiting for players to submit words...</Text>

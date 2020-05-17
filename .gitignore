@@ -12,6 +12,7 @@ web-build/
 web-report/
 app.json
 resources/*
+release_notes/*
 
 # macOS
 .DS_Store
