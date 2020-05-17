@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mainView: {
-    flex: 3,
+    flex: 2,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
@@ -182,20 +182,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   backButtonView: {
-    flex: 2,
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
   errorBox: {
-    minHeight: Dimensions.get('screen').height/25,
-    maxHeight: Dimensions.get('screen').height/25,
+    minHeight: Dimensions.get('screen').height/15,
+    maxHeight: Dimensions.get('screen').height/15,
+    minWidth: '85%',
+    maxWidth: '85%',
   },
   error: {
-    fontSize: Dimensions.get('screen').height/40,
+    fontSize: Dimensions.get('screen').height/50,
     fontFamily: 'poppins-semibold',
     color: '#fff',
+    textAlign: 'center'
   }
 });
 
