@@ -19,11 +19,16 @@ class Create extends Component {
   state = {
     name: '',
     wordCount: '',
-    error: ''
+    error: '',
+    disableButton: false
   }
 
   componentDidMount() {
     this.db = Fire.db;
+  }
+
+  componentWillUnmount() {
+    this.setState({ disableButton: false })
   }
 
   //Returns true if the game id is invalid (already exists)
@@ -66,6 +71,7 @@ class Create extends Component {
 
   async pressSubmit() {
     Keyboard.dismiss();
+
     if (this.state.name.trim() < 1) {
       this.setState({error: `You must enter a name`});
       return
@@ -79,6 +85,7 @@ class Create extends Component {
       this.setState({error: `Words per person can't be more than 10`});
       return
     }
+    this.setState({ disableButton: true });
 
     let newGameID = this.makeGameID(gameIDLength);
     while (await this.isNotValidGameID(newGameID)) {
@@ -113,7 +120,10 @@ class Create extends Component {
         this.props.changeScreen(Screens.LOBBY);
       });
     })
-    .catch((error) => console.log('Game creation failed: ' + error.message));
+    .catch((error) => {
+      this.setState({ disableButton: false });
+      console.log('Game creation failed: ' + error.message);
+    });
   }
 
   render() {
@@ -142,6 +152,7 @@ class Create extends Component {
             <PrimaryButton
               text={'Create'}
               onPress={()=>this.pressSubmit()}
+              disabled={this.state.disableButton}
             />
           </View>
           <View style={styles.backButtonView}>

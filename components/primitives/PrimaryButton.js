@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 PrimaryButton.propTypes = {
   text: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
+  disabled: PropTypes.bool, // By default it is not disabled
   color: PropTypes.string, // White by default
   hasOutline: PropTypes.bool, // No outline by default
   outlineColor: PropTypes.string, //White by default
@@ -27,12 +28,14 @@ export default function PrimaryButton(props) {
   if (props.width) {
     viewStyling.minWidth = props.width
     viewStyling.maxWidth = props.width
-  } 
+  }
+  
+  const isDisabled = !(props.disabled === undefined || props.disabled === false)
 
   return(
     <TouchableOpacity 
       style={[styles.button, viewStyling, props.buttonStyle]} 
-      onPress={() => props.onPress()}
+      onPress={isDisabled ? () => {} : () => props.onPress()}
     >
       <Text style={[styles.text, textStyling, props.textStyle]}>{props.text}</Text>
     </TouchableOpacity>

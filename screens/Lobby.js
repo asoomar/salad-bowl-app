@@ -36,6 +36,9 @@ class Lobby extends Component {
     wordCount: 0,
     wordsPerPlayer: 2, // Default if words per player is not set
     currentSegment: 'Your Words',
+    disableSubmitWords: false,
+    disableLeaveGame: false,
+    disableContinue: false,
   }
 
   componentDidMount() {
@@ -103,9 +106,16 @@ class Lobby extends Component {
     this.db.getRef(`games/${this.props.gameID}/waiting`).off();
     this.db.getRef(`games/${this.props.gameID}/status`).off();
     this.db.getRef(`games/${this.props.gameID}/host`).off();
+
+    this.setState({
+      disableSubmitWords: false,
+      disableLeaveGame: false,
+      disableContinue: false,
+    })
   }
 
   async goHome() {
+    this.setState({ disableLeaveGame: true });
     this.db.logEvent(Events.LEAVE_GAME, {
       screen: 'lobby',
       purpose: 'Leave game button was clicked',
@@ -136,7 +146,7 @@ class Lobby extends Component {
   // Remove the words the user submitted
   async removeUserWords() {
     let currentWords = this.state.words;
-    for (let i = 0; i < currentWords.length; i++) {
+    for (let i = 0; i < wordsPerPlayer; i++) {
       this.db.getRef(`words/${this.props.gameID}/${currentWords[i].key}`).remove()
       .then(()=> {
         console.log(`Removed word (${currentWords[i].word}) from game`);
@@ -194,6 +204,7 @@ class Lobby extends Component {
         return;
       }
     }
+    this.setState({disableSubmitWords: true});
     this.db.logEvent(Events.SUBMIT_WORDS, {
       screen: 'lobby',
       purpose: 'Submit words button was clicked',
@@ -224,7 +235,11 @@ class Lobby extends Component {
       .then(()=> 
       console.log(`No longer waiting for ${this.props.playerID} (${this.props.screenName}) to submit words`))
     }
-    this.setState({editWords: false, currentSegment: 'Players'});
+    this.setState({
+      disableSubmitWords: false, 
+      editWords: false, 
+      currentSegment: 'Players'
+    });
     this.setState((prevState) => {
       let newWords = [...prevState.words];
       for (let i = 0; i < newWords.length; i++) {
@@ -242,10 +257,13 @@ class Lobby extends Component {
       screen: 'lobby',
       purpose: 'Start game to proceed to team distribution',
     })
+    this.setState({ disableSubmitWords: true });
     this.db.getRef(`games/${this.props.gameID}/status`).set(Screens.TEAMS)
     .then(() => {
       console.log(`Setting up teams for game ${this.props.gameID}`);
       this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
+        // This error should never occur, if it does, we need to signal all users to
+        // go back home and we need to display some error 
         if (!isValidSnapshot(snapshot, 1)) {
           this.props.changeScreen(Screens.HOME);
           return
@@ -306,6 +324,7 @@ class Lobby extends Component {
         style={styles.textInput}
         placeholderTextColor='#dddddd'
         footerHeight={Dimensions.get('screen').height/7}
+        disabled={this.state.disableContinue}
         />
       : (
         <ScrollView>
@@ -341,6 +360,7 @@ class Lobby extends Component {
           onPress={()=>this.goHome()}
           buttonStyle={styles.leaveButton}
           textStyle={styles.leaveButtonText}
+          disabled={this.state.disableLeaveGame}
         />
       </View>
     )
@@ -388,6 +408,7 @@ class Lobby extends Component {
                 onPress={()=>this.startGame()}
                 buttonStyle={styles.continueButton}
                 textStyle={styles.continueButtonText}
+                disabled={this.state.disableContinue}
               />
             : <Text style={styles.footerText}>Waiting for host to continue...</Text>   
           } 

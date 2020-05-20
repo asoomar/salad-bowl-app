@@ -12,6 +12,7 @@ class Teams extends Component {
     team1: [],
     team2: [],
     stopTasks: false,
+    disableButton: false,
   }
 
   componentDidMount() {
@@ -65,10 +66,10 @@ class Teams extends Component {
   }
 
   componentWillUnmount() {
-    console.log('Canceling all teams subscriptions')
-    this.setState({stopTasks: true})
+    this.setState({stopTasks: true, disableButton: false})
     this.db.getRef(`players/${this.props.gameID}`).off();
     this.db.getRef(`games/${this.props.gameID}/status`).off();
+    this.db.getRef(`games/${this.props.gameID}/host`).off();
   }
 
   getTeam(teamName) {
@@ -79,6 +80,7 @@ class Teams extends Component {
   }
 
   startGame() {
+    this.setState({ disableButton: true })
     this.db.logEvent(Events.START_GAME, {
       screen: 'teams',
       purpose: 'Start game to proceed to game',
@@ -101,6 +103,7 @@ class Teams extends Component {
       // Set player hasPlayed attribute to true
       this.db.getRef(`players/${this.props.gameID}/${team1[playerIndex][0]}/hasPlayed`).set(true);
     })
+    .catch(() =>  this.setState({ disableButton: false }))
   }
 
   render() {
@@ -131,6 +134,7 @@ class Teams extends Component {
             onPress={()=>this.startGame()}
             buttonStyle={styles.startButton}
             textStyle={styles.startButtonText}
+            disabled={this.state.disableButton}
           /> 
           : <Text style={styles.footerText}>Waiting for host to start game...</Text>
           }

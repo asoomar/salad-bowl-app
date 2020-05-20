@@ -68,6 +68,7 @@ class YourWords extends Component {
             onPress={() => this.props.onSubmit()}
             buttonStyle={styles.submitButton}
             textStyle={styles.submitButtonText}
+            disabled={this.props.disabled}
           />
         </View>
       </KeyboardAwareScrollView>
@@ -80,6 +81,7 @@ YourWords.propTypes = {
   words: PropTypes.array.isRequired,
   onWordChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
   error: PropTypes.string,
   style: PropTypes.object,
   placeholderTextColor: PropTypes.string,
@@ -109,7 +111,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderWidth: 2,
     borderColor: '#4b42f5',
-    // marginTop: 5
   },
   submitButtonText: {
     color: '#4b42f5',

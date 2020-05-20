@@ -12,11 +12,16 @@ class Join extends Component {
   state = {
     name: '',
     joinCode: '',
-    error: ''
+    error: '',
+    disableButton: false,
   }
 
   componentDidMount() {
     this.db = Fire.db;
+  }
+
+  componentWillUnmount() {
+    this.setState({ disableButton: false })
   }
 
   async canUserJoinGame(gameID) { 
@@ -26,18 +31,25 @@ class Join extends Component {
       if (snapshot.val() == null) { 
         // Check if the game exists
         console.log(`Game ${gameID} does not exist`);
-        this.setState({error: `It doesn't look like that game exists`});
+        this.setState({
+          disableButton: false,
+          error: `It doesn't look like that game exists`
+        });
         return false;
       } else if (snapshot.val()[gameID].round !== '' 
         || snapshot.val()[gameID].status !== Screens.LOBBY) { 
         // Check to make sure game hasn't started yet
         console.log(`Game ${snapshot.val()[gameID].round} has already started`);
-        this.setState({error: `Uh oh, it looks like that game has already started`});
+        this.setState({
+          disableButton: false,
+          error: `Uh oh, it looks like that game has already started`
+        });
         return false;
       }
       return true;
     } catch {
       console.log(`Could not check if game ${gameID} exists`);
+      this.setState({ disableButton: false })
       return false;
     }
   }
@@ -52,6 +64,7 @@ class Join extends Component {
       this.setState({error: `Game ID should be ${gameIDLength} characters`});
       return
     }
+    this.setState({ disableButton: true })
     this.db.logEvent(Events.JOIN_GAME, {
       screen: 'join',
       purpose: 'User entered details and clicked "Join"'
@@ -88,6 +101,7 @@ class Join extends Component {
           <PrimaryButton
             text={'Join'}
             onPress={()=>this.pressSubmit()}
+            disabled={this.state.disableButton}
           />
         </View>
         <View style={styles.backButtonView}>
