@@ -371,8 +371,9 @@ class Game extends Component {
         <PrimaryModal 
           title={modalTitles[this.state.round]}
           modalVisible={this.state.isModalVisible}
-          buttonText={'Okay!'}
+          buttonText={'Got It!'}
           onCloseModal={() => this.setState({isModalVisible: false})}
+          minHeight={Dimensions.get('screen').height/5}
           content={
             <Text style={styles.modalContent}>
               {this.state.isPlaying 
@@ -431,9 +432,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modalContent: {
-    fontSize: Dimensions.get('screen').height/42,
+    fontSize: Dimensions.get('screen').height/50,
     fontFamily: 'poppins-semibold',
-    color: '#fff',
+    color: '#ffffffaa',
     textAlign: 'center',
   },
   header: {

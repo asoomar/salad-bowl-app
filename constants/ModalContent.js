@@ -43,3 +43,14 @@ export const modalTitles = {
   [2]: "Round 2: Charades",
   [3]: "Round 3: One Word"
 }
+
+export const modalStart = {
+  CREATE: "In the first field, you should type your name. This name will be " +
+    "visible to other players. \n\nIn the second field, you should enter how " +
+    "many words each player will submit. The typical amount is between 2 and 5 " +
+    "depending how many people you are playing with.",
+
+  JOIN: "In the first field, you should type your name. This name will be " +
+    "visible to other players. \n\nIn the second field, you should enter the " +
+    "Game ID, which should be given to you by the game host.",  
+}

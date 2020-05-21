@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
 import SegmentSelector from '../primitives/SegmentSelector';
 import GameTab from '../segments/GameTab';
 import PlayersTab from '../segments/PlayersTab';
+import MoreTab from '../segments/MoreTab';
 import Events from '../../constants/Events';
 import Fire from '../../Fire';
 import PropTypes from 'prop-types';
@@ -27,7 +28,7 @@ class OpponentPlaying extends Component {
     return (
       <View style={styles.container}>
         <SegmentSelector 
-          segments={['Game', 'Players']}
+          segments={['Game', 'Players', 'More']}
           currentSegment={this.state.currentSegment}
           onChangeSegment={segment => {
             Fire.db.logEvent(Events.SWITCH_TAB, {
@@ -48,6 +49,11 @@ class OpponentPlaying extends Component {
           {this.state.currentSegment === 'Players' 
           ? <PlayersTab 
               players={this.props.players}
+            /> 
+          : null}
+          {this.state.currentSegment === 'More' 
+          ? <MoreTab 
+              onClickInstructions={() => {}}
             /> 
           : null}
         </View>

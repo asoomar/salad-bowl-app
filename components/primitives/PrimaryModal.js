@@ -4,8 +4,15 @@ import PrimaryButton from './PrimaryButton';
 import PropTypes from 'prop-types';
 
 class PrimaryModal extends Component {
+  state = {
+    fontSize: Dimensions.get('screen').height/20
+  } 
 
   render() {
+    const modalStyling = {}
+    if (this.props.minHeight !== undefined)
+      modalStyling.minHeight = this.props.minHeight 
+
     return (
       <Modal
         animationType='fade'
@@ -14,9 +21,21 @@ class PrimaryModal extends Component {
         transparent={true}
       > 
         <View style={styles.background}>
-          <View style={styles.modalBox}>
+          <View style={[styles.modalBox, modalStyling]}>
             <View style={styles.titleView}>
-              <Text style={styles.title}>{this.props.title}</Text>
+              <Text 
+                style={[styles.title, {fontSize: this.state.fontSize}]} 
+                adjustsFontSizeToFit
+                numberOfLines={1}
+                onTextLayout={e => {
+                  const { lines } = e.nativeEvent;
+                  if (lines.length > 1) {
+                    this.setState({fontSize: this.state.fontSize - 1});
+                  }
+                }}
+              >
+                {this.props.title}
+              </Text>
             </View>
             <View style={styles.content}>
               {this.props.content}
@@ -41,6 +60,7 @@ PrimaryModal.propTypes = {
   modalVisible: PropTypes.bool.isRequired,
   buttonText: PropTypes.string.isRequired,
   onCloseModal: PropTypes.func.isRequired,
+  minHeight: PropTypes.number,
 }
   
 const styles = StyleSheet.create({
@@ -76,33 +96,27 @@ const styles = StyleSheet.create({
     padding: Dimensions.get('screen').width * 0.06
   },
   titleView: {
-    flex: 2,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: '100%',
+    marginBottom: 10,
   },
   title: {
-    fontSize: Dimensions.get('screen').height/20,
     fontFamily: 'poppins-semibold',
     color: '#fff',
-    // color: '#4b42f5',
-    flex: 1,
     textAlign: 'center',
   },
   content: {
-    flex: 5,
+    // flex: 5,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
+    marginBottom: 15,
   },
   buttonView: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    alignItems: 'center'
+    alignItems: 'center',
   }
 });
 

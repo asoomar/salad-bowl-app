@@ -146,7 +146,7 @@ class Lobby extends Component {
   // Remove the words the user submitted
   async removeUserWords() {
     let currentWords = this.state.words;
-    for (let i = 0; i < wordsPerPlayer; i++) {
+    for (let i = 0; i < this.state.wordsPerPlayer; i++) {
       this.db.getRef(`words/${this.props.gameID}/${currentWords[i].key}`).remove()
       .then(()=> {
         console.log(`Removed word (${currentWords[i].word}) from game`);

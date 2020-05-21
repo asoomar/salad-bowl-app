@@ -5,13 +5,16 @@ import {
   View,  
   Dimensions, 
   Keyboard,
+  TouchableOpacity,
   TouchableWithoutFeedback} from 'react-native';
 import PrimaryTextInput from '../components/primitives/PrimaryTextInput';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import BackButton from '../components/primitives/BackButton';
+import PrimaryModal from '../components/primitives/PrimaryModal';
 import rand from 'random-seed';
 import Screens from '../constants/Screens';
 import { gameIDLength } from '../constants/Structures';
+import { modalStart } from '../constants/ModalContent';
 import Events from '../constants/Events';
 import Fire from '../Fire';
 
@@ -20,7 +23,8 @@ class Create extends Component {
     name: '',
     wordCount: '',
     error: '',
-    disableButton: false
+    disableButton: false,
+    isModalVisible: false
   }
 
   componentDidMount() {
@@ -130,6 +134,18 @@ class Create extends Component {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
+          <PrimaryModal 
+            title='Creating A Game'
+            modalVisible={this.state.isModalVisible}
+            buttonText='Got It!'
+            onCloseModal={() => this.setState({isModalVisible: false})}
+            minHeight={Dimensions.get('screen').height/5}
+            content={
+              <Text style={styles.modalContent}>
+                {modalStart.CREATE}
+              </Text>
+            }
+          />
           <View style={styles.mainView}>
             <Text style={styles.title}>Create Game</Text>
             <View style={styles.errorBox}>
@@ -154,6 +170,12 @@ class Create extends Component {
               onPress={()=>this.pressSubmit()}
               disabled={this.state.disableButton}
             />
+            <TouchableOpacity 
+              style={styles.questionTag}
+              onPress={() => this.setState({isModalVisible: true})}
+            > 
+              <Text style={styles.questionTagText}>Need Help?</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.backButtonView}>
             <BackButton 
@@ -210,6 +232,26 @@ const styles = StyleSheet.create({
     fontFamily: 'poppins-semibold',
     color: '#fff',
     textAlign: 'center'
+  },
+  questionTag: {
+    marginTop: 15,
+    paddingLeft: Dimensions.get('screen').width/15,
+    paddingRight: Dimensions.get('screen').width/15,
+    minWidth: '85%',
+    maxWidth: '85%',
+  },
+  questionTagText: {
+    fontSize: Dimensions.get('screen').height/50,
+    fontFamily: 'poppins-semibold',
+    color: '#ffffff66',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  modalContent: {
+    fontSize: Dimensions.get('screen').height/50,
+    fontFamily: 'poppins-semibold',
+    color: '#ffffffaa',
+    textAlign: 'left'
   }
 });
 
