@@ -2,6 +2,7 @@ import React, {Component, StrictMode} from 'react';
 import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
 import SegmentSelector from '../components/primitives/SegmentSelector';
 import PrimaryButton from '../components/primitives/PrimaryButton';
+import PrimaryModal from '../components/primitives/PrimaryModal';
 import YourWords from '../components/segments/YourWords';
 import Screens from '../constants/Screens';
 import NumberRanks from '../constants/NumberRanks';
@@ -39,6 +40,7 @@ class Lobby extends Component {
     disableSubmitWords: false,
     disableLeaveGame: false,
     disableContinue: false,
+    showHostModal: true,
   }
 
   componentDidMount() {
@@ -370,6 +372,27 @@ class Lobby extends Component {
 
     return (
       <View style={styles.container}>
+        <PrimaryModal 
+          title='Invite Players'
+          modalVisible={
+            this.props.playerID === this.state.host.id && 
+            this.state.showHostModal}
+          buttonText={'Got It!'}
+          onCloseModal={() => this.setState({showHostModal: false})}
+          minHeight={Dimensions.get('screen').height/5}
+          content={
+            <View style={styles.modalContent}>
+              <View style={styles.modalCode}>
+                <Text style={styles.modalCodeText} selectable>
+                  {this.props.gameID}
+                </Text>
+              </View>
+              <Text style={styles.modalText}>
+                Share the code above with others so they can join this game!
+              </Text>
+            </View>
+          }
+        />
         <View style={styles.header}>
           <Text style={styles.title}>Lobby</Text> 
           <Text style={styles.subtitle}>Game ID is {this.props.gameID}</Text> 
@@ -424,6 +447,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     display: 'flex',
+  },
+  modalContent: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+  },
+  modalCode: {
+    backgroundColor: '#3c34d9',
+    borderRadius: Dimensions.get('screen').height,
+    paddingTop: 3,
+    paddingLeft: 30,
+    paddingRight: 30,
+    width: '100%'
+  },
+  modalCodeText: {
+    color: '#ffffff',
+    fontSize: Dimensions.get('screen').height/25,
+    fontFamily: 'poppins-semibold',
+    textAlign: 'center',
+    width: '100%'
+  },
+  modalText: {
+    fontSize: Dimensions.get('screen').height/45,
+    fontFamily: 'poppins-semibold',
+    color: '#ffffffaa',
+    textAlign: 'center',
+    marginTop: 10,
   },
   header: {
     flex: 2,

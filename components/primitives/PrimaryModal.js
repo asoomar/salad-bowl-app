@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   content: {
-    // flex: 5,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
