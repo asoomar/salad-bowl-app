@@ -33,6 +33,10 @@ class Fire {
     async logEvent(eventName, properties) {
         await Analytics.logEvent(eventName, properties);
     }
+
+    async logScreen(screenName) {
+        await Analytics.setCurrentScreen(screenName);
+    }
 }
 
 Fire.db = new Fire();

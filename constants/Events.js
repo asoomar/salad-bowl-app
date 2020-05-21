@@ -11,7 +11,8 @@ const Events = {
   START_ROUND: "start_round",
   PASS_WORD: "pass_word",
   NEXT_WORD: "next_word",
-  GO_HOME: "go_home"
+  GO_HOME: "go_home",
+  FINISH_GAME: "finish_game"
 }
 
 export default Events

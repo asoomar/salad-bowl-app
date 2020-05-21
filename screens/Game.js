@@ -140,6 +140,9 @@ class Game extends Component {
     this.db.getRef(`games/${this.props.gameID}/status`).on('value', (snapshot) => {
       if (snapshot.val() === Screens.FINISH) {
         this.props.changeScreen(Screens.FINISH);
+        this.db.logEvent(Events.FINISH_GAME, {
+          purpose: 'User finished a game',
+        })
       }
     });
   }

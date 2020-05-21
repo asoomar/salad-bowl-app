@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { StyleSheet, SafeAreaView } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
 import Screens from './constants/Screens';
@@ -10,6 +10,7 @@ import Lobby from './screens/Lobby';
 import Teams from './screens/Teams';
 import Game from './screens/Game';
 import Finish from './screens/Finish';
+import Fire from './Fire';
 
 const fetchFonts = async () => {
   await Font.loadAsync({
@@ -23,6 +24,10 @@ const fetchFonts = async () => {
 export default function App() {
   //Application state
   const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
+
+  useEffect(() => {
+    Fire.db.logScreen(currentScreen);
+  }, [currentScreen]);
 
   //User state
   const [name, setName] = useState('');
