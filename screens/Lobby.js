@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
 import SegmentSelector from '../components/primitives/SegmentSelector';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import PrimaryModal from '../components/primitives/PrimaryModal';
+import InstructionsModal from '../components/segments/InstructionsModal';
 import YourWords from '../components/segments/YourWords';
 import Screens from '../constants/Screens';
 import NumberRanks from '../constants/NumberRanks';
@@ -41,6 +42,7 @@ class Lobby extends Component {
     disableLeaveGame: false,
     disableContinue: false,
     showHostModal: true,
+    showInstructions: false,
   }
 
   componentDidMount() {
@@ -358,6 +360,12 @@ class Lobby extends Component {
     let morePane = (
       <View style={styles.moreView}>
         <PrimaryButton 
+          text='How to Play'
+          onPress={() => this.setState({showInstructions: true})}
+          buttonStyle={styles.instructionsButton}
+          textStyle={styles.instructionsButtonText}
+        />
+        <PrimaryButton 
           text='Leave Game'
           onPress={()=>this.goHome()}
           buttonStyle={styles.leaveButton}
@@ -372,6 +380,10 @@ class Lobby extends Component {
 
     return (
       <View style={styles.container}>
+        <InstructionsModal 
+          onCloseModal={() => this.setState({showInstructions: false})}
+          modalVisible={this.state.showInstructions}
+        />
         <PrimaryModal 
           title='Invite Players'
           modalVisible={
@@ -523,8 +535,9 @@ const styles = StyleSheet.create({
   moreView: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    height: '100%'
   },
   leaveButton: {
     backgroundColor: '#ffffff',
@@ -533,7 +546,6 @@ const styles = StyleSheet.create({
     minWidth: '60%',
     maxWidth: '60%',
     height: Dimensions.get('screen').height/15,
-    margin: 20
   },
   leaveButtonText: {
     color: '#ff0000',

@@ -7,10 +7,12 @@ import Fire from '../Fire';
 import UserPlaying from '../components/segments/UserPlaying';
 import OpponentPlaying from '../components/segments/OpponentPlaying';
 import PrimaryModal from '../components/primitives/PrimaryModal';
+import InstructionsModal from '../components/segments/InstructionsModal';
 import { 
   modalContentPlaying, 
   modalContentWatching,
   modalTitles,
+  modalSubtitles
  } from '../constants/ModalContent';
 import { isValidSnapshot } from '../global/GlobalFunctions';
 
@@ -29,6 +31,7 @@ class Game extends Component {
     turnTime: 60000, //60 seconds by default
     timeRemaining: 60000, 
     isModalVisible: false,
+    showInstructions: false,
   }
 
   componentDidMount() {
@@ -113,7 +116,7 @@ class Game extends Component {
     // Listen for round change
     this.db.getRef(`games/${this.props.gameID}/round`).on('value', (snapshot) => {
       let roundState = snapshot.val();
-      this.setState({round: roundState, isModalVisible: true});
+      this.setState({round: roundState, isModalVisible: true, showInstructions: false});
     });
 
     // Listen for turn timestamp
@@ -378,12 +381,21 @@ class Game extends Component {
           onCloseModal={() => this.setState({isModalVisible: false})}
           minHeight={Dimensions.get('screen').height/5}
           content={
-            <Text style={styles.modalContent}>
-              {this.state.isPlaying 
-              ? modalContentPlaying[this.state.round]
-              : modalContentWatching[this.state.round]}
-            </Text>
+            <>
+              <Text style={styles.modalSubheading}>
+                {modalSubtitles[this.state.round]}
+              </Text>
+              <Text style={styles.modalContent}>
+                {this.state.isPlaying 
+                ? modalContentPlaying[this.state.round]
+                : modalContentWatching[this.state.round]}
+              </Text>
+            </>
           }
+        />
+        <InstructionsModal 
+          onCloseModal={() => this.setState({showInstructions: false})}
+          modalVisible={this.state.showInstructions}
         />
         <View style={styles.header}>
           <Text style={styles.title}>Round {this.state.round}</Text>
@@ -416,6 +428,7 @@ class Game extends Component {
               currentPlayer={this.state.currentPlayer.name}
               currentTeam={this.state.currentPlayer.team}
               players={this.state.players}
+              onClickInstructions={() => this.setState({showInstructions: true})}
             />}
         </View>
         <View style={styles.footer}>
@@ -433,6 +446,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  modalSubheading: {
+    fontSize: Dimensions.get('screen').height/40,
+    fontFamily: 'poppins-semibold',
+    color: '#ffffff',
+    textAlign: 'left'
   },
   modalContent: {
     fontSize: Dimensions.get('screen').height/50,

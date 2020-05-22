@@ -9,7 +9,7 @@ class MoreTab extends Component {
     return (
       <View style={styles.container}>
         <PrimaryButton 
-          text='Salad Bowl Instructions'
+          text='How to Play'
           onPress={()=>this.props.onClickInstructions()}
           buttonStyle={styles.instructionsButton}
           textStyle={styles.instructionsButtonText}

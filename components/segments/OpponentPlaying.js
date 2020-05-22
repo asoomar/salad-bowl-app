@@ -53,7 +53,7 @@ class OpponentPlaying extends Component {
           : null}
           {this.state.currentSegment === 'More' 
           ? <MoreTab 
-              onClickInstructions={() => {}}
+              onClickInstructions={() => this.props.onClickInstructions()}
             /> 
           : null}
         </View>
@@ -65,7 +65,9 @@ class OpponentPlaying extends Component {
 OpponentPlaying.propTypes = {
   players: PropTypes.array.isRequired,
   currentPlayer: PropTypes.string,
-  currentTeam: PropTypes.number
+  currentTeam: PropTypes.number,
+  players: PropTypes.array.isRequired,
+  onClickInstructions: PropTypes.func.isRequired
 }
   
 const styles = StyleSheet.create({
