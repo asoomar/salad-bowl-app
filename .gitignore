@@ -13,6 +13,8 @@ web-report/
 app.json
 resources/*
 release_notes/*
+credentials/*
+nyx/node_modules/**/*
 
 # macOS
 .DS_Store

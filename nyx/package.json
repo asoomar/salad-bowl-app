@@ -1,0 +1,23 @@
+{
+  "name": "nyx",
+  "version": "1.1.1",
+  "description": "Swap environment and credentials between prod and dev versions",
+  "main": "index.js",
+  "bin": {
+    "nyx": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "CLI",
+    "expo"
+  ],
+  "author": "Ali Soomar",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "clear": "^0.1.0",
+    "figlet": "^1.4.0"
+  }
+}
