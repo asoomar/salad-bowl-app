@@ -34,6 +34,7 @@ export default function App() {
   const [playerID, setPlayerID] = useState('');
   const [gameID, setGameID] = useState('');
   const [team, setTeam] = useState(-1);
+  const [forceHomeMessage, setForceHomeMessage] = useState(null);
 
   const [dataLoaded, setDataLoaded] = useState(false);
   //Fetch fonts
@@ -54,10 +55,12 @@ export default function App() {
       {currentScreen === Screens.HOME ? 
         <Home 
           changeScreen={(screen) => setCurrentScreen(screen)}
+          setHomeMessage={(message) => setForceHomeMessage(message)}
           setPlayerID={(id) => setPlayerID(id)}
           updateName={(joinName) => setName(joinName)}
           updateGameID={(id)=>setGameID(id)}
           updateTeam={(team) => setTeam(team)}
+          homeMessage={forceHomeMessage}
         /> 
         : null}
       
@@ -83,6 +86,7 @@ export default function App() {
       {currentScreen === Screens.LOBBY ? 
         <Lobby 
           changeScreen={(screen) => setCurrentScreen(screen)}
+          setHomeMessage={(message) => setForceHomeMessage(message)}
           setPlayerID={(id) => setPlayerID(id)}
           gameID={gameID}
           playerID={playerID}

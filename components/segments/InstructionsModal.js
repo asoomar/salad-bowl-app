@@ -37,7 +37,7 @@ class InstructionsModal extends Component {
     const totalPageCount = Object.values(modalInstructionContent).length
     const isLastPage = this.state.page + 1 === totalPageCount
     return (
-      <Modal
+    <Modal
       animationType='fade'
       presentationStyle='overFullScreen'
       visible={this.props.modalVisible}

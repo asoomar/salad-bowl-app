@@ -43,6 +43,7 @@ class Lobby extends Component {
     disableContinue: false,
     showHostModal: true,
     showInstructions: false,
+    showConfirmLeave: false,
   }
 
   componentDidMount() {
@@ -72,8 +73,14 @@ class Lobby extends Component {
         this.props.changeScreen(Screens.HOME);
         return
       }
-      let host = Object.entries(snapshot.val())[0];
-      this.setState({host: {name: host[1], id: host[0]}});
+      if (snapshot.val() === "") {
+        console.log("host is invalid")
+        this.props.setHomeMessage("The game ended because the host left");
+        this.goHome();
+      } else {
+        let host = Object.entries(snapshot.val())[0];
+        this.setState({host: {name: host[1], id: host[0]}});
+      }
     });
 
     // Listen for any players that have been added to the game  
@@ -131,12 +138,21 @@ class Lobby extends Component {
       console.log(`${this.props.playerID} (${this.props.screenName}) was removed from the game`);
       this.removeUserWaiting();
       this.removeUserWords();
+      this.resetHost();
       this.checkIfLastToLeave();
     })
     .catch((error) => 'Remove failed: ' + error.message)
     .finally(()=> {
-      this.props.changeScreen(Screens.HOME)
+        this.props.changeScreen(Screens.HOME)
     });
+  }
+
+  async resetHost() {
+    if (this.props.playerID === this.state.host.id) {
+      this.db.getRef(`games/${this.props.gameID}/host`).set('')
+      .then(() => console.log("Host was reset"))
+      .catch((err) => console.log("Could not reset host: " + err))
+    }
   }
 
   async removeUserWaiting() {
@@ -367,7 +383,7 @@ class Lobby extends Component {
         />
         <PrimaryButton 
           text='Leave Game'
-          onPress={()=>this.goHome()}
+          onPress={() => this.setState({showConfirmLeave: true})}
           buttonStyle={styles.leaveButton}
           textStyle={styles.leaveButtonText}
           disabled={this.state.disableLeaveGame}
@@ -401,6 +417,25 @@ class Lobby extends Component {
               </View>
               <Text style={styles.modalText}>
                 Share the code above with others so they can join this game!
+              </Text>
+            </View>
+          }
+        />
+        <PrimaryModal 
+          title='Are you sure?'
+          modalVisible={this.state.showConfirmLeave}
+          twoButtons
+          buttonText={'Leave'}
+          onCancel={() => this.setState({showConfirmLeave: false})}
+          onCloseModal={() => this.goHome()}
+          minHeight={Dimensions.get('screen').height/5}
+          titleHeight={Dimensions.get('screen').height/26}
+          content={
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>
+                {this.props.playerID === this.state.host.id
+                ? "Leaving the game as host will end the game for everyone!"
+                : "Leaving the game is not what the cool kids are doing!"}
               </Text>
             </View>
           }

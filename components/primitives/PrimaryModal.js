@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 
 class PrimaryModal extends Component {
   state = {
-    fontSize: Dimensions.get('screen').height/20
+    fontSize: this.props.titleHeight 
+      ? this.props.titleHeight 
+      : Dimensions.get('screen').height/20
   } 
 
   render() {
@@ -41,10 +43,28 @@ class PrimaryModal extends Component {
               {this.props.content}
             </View>
             <View style={styles.buttonView}>
-              <PrimaryButton 
-                text={this.props.buttonText}
-                onPress={() => this.props.onCloseModal()}
-              />
+              {this.props.twoButtons
+              ? <View style={styles.button}>
+                  <PrimaryButton 
+                    buttonStyle={styles.buttonStyleSecondary}
+                    textStyle={styles.buttonTextSecondary}
+                    text={"Cancel"}
+                    onPress={() => this.props.onCancel()}
+                  />
+                </View>
+              : null}
+              <View style={styles.button}>
+                <PrimaryButton 
+                  buttonStyle={this.props.twoButtons 
+                    ? styles.buttonStyleSecondary
+                    : {}}
+                  textStyle={this.props.twoButtons
+                    ? styles.buttonTextSecondary
+                    : {}}
+                  text={this.props.buttonText}
+                  onPress={() => this.props.onCloseModal()}
+                />
+              </View>
             </View>
           </View>
         </View>
@@ -61,6 +81,9 @@ PrimaryModal.propTypes = {
   buttonText: PropTypes.string.isRequired,
   onCloseModal: PropTypes.func.isRequired,
   minHeight: PropTypes.number,
+  titleHeight: PropTypes.number,
+  twoButtons: PropTypes.bool,
+  onCancel: PropTypes.func,
 }
   
 const styles = StyleSheet.create({
@@ -113,9 +136,29 @@ const styles = StyleSheet.create({
   },
   buttonView: {
     display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  buttonStyle: {
+    maxWidth: '90%',
+    minWidth: '90%'
+  },
+  buttonStyleSecondary: {
+    maxWidth: '90%',
+    minWidth: '90%',
+    backgroundColor: '#4b42f5',
+    marginTop: 0,
+    marginBottom: 0
+  },
+  buttonTextSecondary: {
+    color: '#fff'
+  },
+  button: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 

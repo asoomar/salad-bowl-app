@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
 import PrimaryButton from '../components/primitives/PrimaryButton';
+import PrimaryModal from '../components/primitives/PrimaryModal';
 import InstructionsModal from '../components/segments/InstructionsModal';
 import * as app from '../app.json';
 
@@ -16,6 +17,18 @@ export default function Home(props) {
 
   return (
     <View style={styles.container}>
+      <PrimaryModal 
+        onCloseModal={() => props.setHomeMessage(null)}
+        modalVisible={!!props.homeMessage}
+        title="Uh Oh!"
+        buttonText="Okay"
+        minHeight={Dimensions.get('screen').height/10}
+        content={
+          <Text style={styles.modalText}>
+            {props.homeMessage}
+          </Text>
+        }
+      />
       <InstructionsModal 
         onCloseModal={() => setShowInstructions(false)}
         modalVisible={showInstructions}
@@ -101,5 +114,12 @@ export default function Home(props) {
       textAlign: 'right',
       paddingRight: 20,
       paddingLeft: 20
-    }
+    },
+    modalText: {
+      fontSize: Dimensions.get('screen').height/45,
+      fontFamily: 'poppins-semibold',
+      color: '#ffffffaa',
+      textAlign: 'center',
+      marginTop: 10,
+    },
   });
