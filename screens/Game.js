@@ -66,7 +66,8 @@ class Game extends Component {
       this.setState({
         isPlaying: isPlayingState,
         isTeamPlaying: isTeamPlayingState,
-        currentPlayer: currentPlayerStateObj
+        currentPlayer: currentPlayerStateObj,
+        timeRemaining: 60000
       })
       if (isPlayingState) {
         this.getAvailableWords();
