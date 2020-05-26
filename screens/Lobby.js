@@ -70,11 +70,12 @@ class Lobby extends Component {
     //Listen for Host change
     this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 0)) {
+        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+        "ended your game! \n(Error #0)")
         this.props.changeScreen(Screens.HOME);
         return
       }
       if (snapshot.val() === "") {
-        console.log("host is invalid")
         this.props.setHomeMessage("The game ended because the host left");
         this.goHome();
       } else {
@@ -285,6 +286,8 @@ class Lobby extends Component {
         // This error should never occur, if it does, we need to signal all users to
         // go back home and we need to display some error 
         if (!isValidSnapshot(snapshot, 1)) {
+          this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #1)")
           this.props.changeScreen(Screens.HOME);
           return
         }

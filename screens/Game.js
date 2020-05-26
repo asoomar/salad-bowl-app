@@ -41,6 +41,8 @@ class Game extends Component {
     if (this.props.team !== 0 && this.props.team !== 1) {
       this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}/team`).once('value', (snapshot) => {
         if (!isValidSnapshot(snapshot, 10)) {
+          this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #10)")
           this.props.changeScreen(Screens.HOME);
           return
         }
@@ -52,6 +54,8 @@ class Game extends Component {
     this.db.getRef(`games/${this.props.gameID}/currentPlayer`).on('value', (snapshot) => {
       // Assumes there is only 1 object and the first one is the current player
       if (!isValidSnapshot(snapshot, 4)) {
+        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #4)")
         this.props.changeScreen(Screens.HOME);
         return
       }
@@ -77,6 +81,8 @@ class Game extends Component {
     // Listen to players in game (used to see teams and player scores)
     this.db.getRef(`players/${this.props.gameID}`).on('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 11)) {
+        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #11)")
         this.props.changeScreen(Screens.HOME);
         return
       }
@@ -98,6 +104,8 @@ class Game extends Component {
     // Listen for score changes
     this.db.getRef(`games/${this.props.gameID}/score`).on('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 5)) {
+        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #5)")
         this.props.changeScreen(Screens.HOME);
         return
       }
@@ -165,6 +173,8 @@ class Game extends Component {
   getAvailableWords() {
     this.db.getRef(`words/${this.props.gameID}`).once('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 6)) {
+        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #6)")
         this.props.changeScreen(Screens.HOME);
         return
       }
@@ -212,6 +222,8 @@ class Game extends Component {
       this.db.getRef(`games/${this.props.gameID}/round`).set(this.state.round+1);
       this.db.getRef(`words/${this.props.gameID}`).once('value', (snapshot) => {
         if (!isValidSnapshot(snapshot, 7)) {
+          this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #7)")
           this.props.changeScreen(Screens.HOME);
           return
         }
@@ -288,6 +300,8 @@ class Game extends Component {
         });
         this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
           if (!isValidSnapshot(snapshot, 8)) {
+            this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #8)")
             this.props.changeScreen(Screens.HOME);
             return
           }

@@ -97,6 +97,7 @@ export default function App() {
       {currentScreen === Screens.TEAMS ? 
         <Teams
           changeScreen={(screen) => setCurrentScreen(screen)}
+          setHomeMessage={(message) => setForceHomeMessage(message)}
           updateTeam={(team) => setTeam(team)}
           currentScreen={currentScreen}
           gameID={gameID}
@@ -108,6 +109,7 @@ export default function App() {
       {currentScreen === Screens.GAME ? 
         <Game
           changeScreen={(screen) => setCurrentScreen(screen)}
+          setHomeMessage={(message) => setForceHomeMessage(message)}
           updateTeam={(team) => setTeam(team)}
           gameID={gameID}
           playerID={playerID}
@@ -119,6 +121,7 @@ export default function App() {
       {currentScreen === Screens.FINISH ? 
         <Finish
           changeScreen={(screen) => setCurrentScreen(screen)}
+          setHomeMessage={(message) => setForceHomeMessage(message)}
           gameID={gameID}
           playerID={playerID}
           screenName={name}

@@ -17,6 +17,8 @@ class Finish extends Component {
 
     this.db.getRef(`games/${this.props.gameID}/score`).once('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 9)) {
+        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+          "ended your game! \n(Error #9)")
         this.props.changeScreen(Screens.HOME);
         return
       }
