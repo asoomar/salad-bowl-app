@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
+import { useKeepAwake } from 'expo-keep-awake';
 import Screens from './constants/Screens';
 import Home from './screens/Home';
 import Create from './screens/Create';
@@ -22,6 +23,7 @@ const fetchFonts = async () => {
 }
 
 export default function App() {
+  useKeepAwake();
   //Application state
   const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
 
