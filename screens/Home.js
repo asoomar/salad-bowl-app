@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity } from 'rea
 import Screens from '../constants/Screens';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import InstructionsModal from '../components/segments/InstructionsModal';
+import * as app from '../app.json';
 
 const isTitleImage = true
 
@@ -19,6 +20,7 @@ export default function Home(props) {
         onCloseModal={() => setShowInstructions(false)}
         modalVisible={showInstructions}
       />
+      <Text style={styles.versionText}>v{app.expo.version}</Text>
       <View style={styles.titleView}>
         {isTitleImage 
         ? <Image style={styles.image} source={require('../assets/logo.png')} />
@@ -90,6 +92,14 @@ export default function Home(props) {
       fontFamily: 'poppins-semibold',
       color: '#ffffff66',
       textAlign: 'center',
-      // textDecorationLine: 'underline',
     },
+    versionText: {
+      fontSize: Dimensions.get('screen').height/60,
+      fontFamily: 'poppins-italic',
+      color: '#ffffff33',
+      minWidth: '100%',
+      textAlign: 'right',
+      paddingRight: 20,
+      paddingLeft: 20
+    }
   });
