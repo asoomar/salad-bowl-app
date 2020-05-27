@@ -15,6 +15,7 @@ resources/*
 release_notes/*
 credentials/*
 nyx/node_modules/**/*
+constants/Ads.js
 
 # macOS
 .DS_Store

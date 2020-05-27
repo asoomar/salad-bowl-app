@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
 import { useKeepAwake } from 'expo-keep-awake';
+import { setTestDeviceIDAsync } from 'expo-ads-admob';
 import Screens from './constants/Screens';
 import Home from './screens/Home';
 import Create from './screens/Create';

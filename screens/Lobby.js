@@ -1,4 +1,4 @@
-import React, {Component, StrictMode} from 'react';
+import React, { Component } from 'react';
 import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
 import SegmentSelector from '../components/primitives/SegmentSelector';
 import PrimaryButton from '../components/primitives/PrimaryButton';
@@ -12,6 +12,10 @@ import Events from '../constants/Events';
 import { DEV } from '../constants/Mode';
 import Fire from '../Fire';
 import _ from 'lodash';
+import Ads from '../constants/Ads';
+import {
+  AdMobBanner,
+} from 'expo-ads-admob';
 
 const playerMinLimit = DEV ? 2 : 4  
 
@@ -382,7 +386,6 @@ class Lobby extends Component {
           text='How to Play'
           onPress={() => this.setState({showInstructions: true})}
           buttonStyle={styles.instructionsButton}
-          textStyle={styles.instructionsButtonText}
         />
         <PrimaryButton 
           text='Leave Game'
@@ -391,6 +394,13 @@ class Lobby extends Component {
           textStyle={styles.leaveButtonText}
           disabled={this.state.disableLeaveGame}
         />
+        <View style={styles.adView}>
+          <AdMobBanner
+            bannerSize="mediumRectangle"
+            adUnitID={Ads.LobbyMorePane.id.ios}
+            servePersonalizedAds
+          />
+        </View>
       </View>
     )
     
@@ -573,20 +583,35 @@ const styles = StyleSheet.create({
   moreView: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    height: '100%'
+    height: '100%',
+    paddingRight: 20,
+    paddingLeft: 20,
+    paddingTop: 10,
   },
   leaveButton: {
     backgroundColor: '#ffffff',
-    borderWidth: 2,
-    borderColor: '#ff0000',
-    minWidth: '60%',
+    minWidth: '20%',
     maxWidth: '60%',
-    height: Dimensions.get('screen').height/15,
+    height: Dimensions.get('screen').height/18,
+    margin: 0,
   },
   leaveButtonText: {
     color: '#ff0000',
+  },
+  instructionsButton: {
+    backgroundColor: '#ffffff',
+    minWidth: '20%',
+    maxWidth: '80%',
+    height: Dimensions.get('screen').height/18,
+    margin: 0,
+  },
+  adView: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
   },
   editButton: {
     backgroundColor: '#ffffff',
