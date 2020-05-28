@@ -35,7 +35,7 @@ export default function PrimaryTextInput(props) {
       onFocus={props.onFocus ? () => props.onFocus() : () => {}}
       onSubmitEditing={props.onSubmitEditing ? () => props.onSubmitEditing() : () => {}}
       placeholder={props.placeholder}
-      placeholderTextColor={props.placeholderTextColor || `#342bcf`}
+      placeholderTextColor={props.placeholderTextColor || '#1c18a8'}
       keyboardType={props.keyboardType}
       returnKeyType={props.returnKeyType ? props.returnKeyType : 'default'}
       value={props.value}
