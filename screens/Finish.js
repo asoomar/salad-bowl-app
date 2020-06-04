@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import Screens from '../constants/Screens';
 import Events from '../constants/Events';
 import Fire from '../Fire';
 import PrimaryButton from '../components/primitives/PrimaryButton';
-import { isValidSnapshot } from '../global/GlobalFunctions';
+import { isValidSnapshot} from '../global/GlobalFunctions';
 
 class Finish extends Component {
   state = {

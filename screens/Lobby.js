@@ -7,7 +7,8 @@ import InstructionsModal from '../components/segments/InstructionsModal';
 import YourWords from '../components/segments/YourWords';
 import Screens from '../constants/Screens';
 import NumberRanks from '../constants/NumberRanks';
-import { isValidSnapshot } from '../global/GlobalFunctions';
+import { isValidSnapshot, getCurrentTimestamp } from '../global/GlobalFunctions';
+import { gameStorageValue } from '../constants/FirestoreValues';
 import Events from '../constants/Events';
 import { DEV } from '../constants/Mode';
 import Fire from '../Fire';
@@ -287,8 +288,6 @@ class Lobby extends Component {
     .then(() => {
       console.log(`Setting up teams for game ${this.props.gameID}`);
       this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
-        // This error should never occur, if it does, we need to signal all users to
-        // go back home and we need to display some error 
         if (!isValidSnapshot(snapshot, 1)) {
           this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
           "ended your game! \n(Error #1)")
@@ -310,8 +309,19 @@ class Lobby extends Component {
         }
         this.db.getRef(`players/${this.props.gameID}`).update(playersWithTeams);
       });
+      this.db.getCollection(gameStorageValue).doc(`${this.props.gameID}${this.props.playerID}`).set({
+        playerCount: this.state.players.length,
+        wordCount: this.state.players.length*this.state.wordsPerPlayer,
+        timeStart: getCurrentTimestamp(),
+        timeFinish: null,
+        didFinish: false
+      }).then(() => console.log('Create game in permanent logs'))
+      .catch(err => console.log(err))
     })
-    .catch((error) => console.log(`There was an error starting the game ${this.props.GameID}`))
+    .catch((error) => {
+      console.log(`There was an error starting the game ${this.props.GameID}`)
+      console.log(error)
+    })
   }
 
   getWaitingToJoinText() {

@@ -10,12 +10,17 @@ npm-debug.*
 *.orig.*
 web-build/
 web-report/
+
+# private
 app.json
 resources/*
 release_notes/*
 credentials/*
-nyx/node_modules/**/*
 constants/Ads.js
+constants/FirestoreValues.js
+
+# misc
+nyx/node_modules/**/*
 
 # macOS
 .DS_Store

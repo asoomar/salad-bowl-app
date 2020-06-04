@@ -14,7 +14,8 @@ import {
   modalTitles,
   modalSubtitles
  } from '../constants/ModalContent';
-import { isValidSnapshot } from '../global/GlobalFunctions';
+import { isValidSnapshot, getCurrentTimestamp } from '../global/GlobalFunctions';
+import { gameStorageValue } from '../constants/FirestoreValues';
 
 class Game extends Component {
   state = {
@@ -32,6 +33,7 @@ class Game extends Component {
     timeRemaining: 60000, 
     isModalVisible: false,
     showInstructions: false,
+    host: {name: '', id: ''}
   }
 
   componentDidMount() {
@@ -155,6 +157,30 @@ class Game extends Component {
         this.db.logEvent(Events.FINISH_GAME, {
           purpose: 'User finished a game',
         })
+        if (this.props.playerID === this.state.host.id) {
+          this.db.getCollection(gameStorageValue).doc(`${this.props.gameID}${this.props.playerID}`).update({
+            timeFinish: getCurrentTimestamp(),
+            didFinish: true
+          }).then(() => console.log('Store finish game in permanent logs'))
+          .catch(err => console.log(err))  
+        }
+      }
+    });
+
+    //Listen for Host change
+    this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
+      if (!isValidSnapshot(snapshot, 13)) {
+        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
+        "ended your game! \n(Error #13)")
+        this.props.changeScreen(Screens.HOME);
+        return
+      }
+      if (snapshot.val() === "") {
+        this.props.setHomeMessage("The game ended because the host left");
+        this.props.changeScreen(Screens.HOME);
+      } else {
+        let host = Object.entries(snapshot.val())[0];
+        this.setState({host: {name: host[1], id: host[0]}});
       }
     });
   }
@@ -166,6 +192,7 @@ class Game extends Component {
     this.db.getRef(`games/${this.props.gameID}/turnStartTimestamp`).off();
     this.db.getRef(`games/${this.props.gameID}/turnTime`).off();
     this.db.getRef(`games/${this.props.gameID}/status`).off();
+    this.db.getRef(`games/${this.props.gameID}/host`).off();
     this.db.getRef(`players/${this.props.gameID}`).off();
     clearInterval(this.myInterval);
   }

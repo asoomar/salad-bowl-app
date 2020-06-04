@@ -1,6 +1,7 @@
 import Fire from '../Fire';
 import Events from '../constants/Events';
 import Errors from '../constants/Errors';
+import firebase from 'firebase';
 
 export const isValidSnapshot = (snapshot, errorCode) => {
   if (!snapshot || snapshot.val() === null || snapshot.val() === undefined) {
@@ -14,4 +15,8 @@ export const isValidSnapshot = (snapshot, errorCode) => {
     return false
   }
   return true
+}
+
+export const getCurrentTimestamp = () => {
+  return firebase.firestore.Timestamp.now();
 }

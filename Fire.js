@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import 'firebase/firestore';
 import * as Analytics from 'expo-firebase-analytics'; 
 import * as app from './app.json';
 
@@ -22,6 +23,12 @@ class Fire {
         }
     }
 
+    // Used for firestore
+    getCollection = (collection) => {
+        return firebase.firestore().collection(collection);
+    }
+
+    // Used for realtime database
     getRef = (reference) => {
         return firebase.database().ref(reference);
     }
