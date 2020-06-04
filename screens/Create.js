@@ -11,6 +11,7 @@ import PrimaryTextInput from '../components/primitives/PrimaryTextInput';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import BackButton from '../components/primitives/BackButton';
 import PrimaryModal from '../components/primitives/PrimaryModal';
+import LoadingPage from '../components/primitives/LoadingPage';
 import rand from 'random-seed';
 import Screens from '../constants/Screens';
 import { gameIDLength } from '../constants/Structures';
@@ -24,7 +25,8 @@ class Create extends Component {
     wordCount: '',
     error: '',
     disableButton: false,
-    isModalVisible: false
+    isModalVisible: false,
+    isLoading: false,
   }
 
   componentDidMount() {
@@ -32,7 +34,7 @@ class Create extends Component {
   }
 
   componentWillUnmount() {
-    this.setState({ disableButton: false })
+    this.setState({ disableButton: false, isLoading: false })
   }
 
   //Returns true if the game id is invalid (already exists)
@@ -89,7 +91,7 @@ class Create extends Component {
       this.setState({error: `Words per person can't be more than 10`});
       return
     }
-    this.setState({ disableButton: true });
+    this.setState({ disableButton: true, isLoading: true });
 
     let newGameID = this.makeGameID(gameIDLength);
     while (await this.isNotValidGameID(newGameID)) {
@@ -125,72 +127,76 @@ class Create extends Component {
       });
     })
     .catch((error) => {
-      this.setState({ disableButton: false });
+      this.setState({ disableButton: false, isLoading: false });
       console.log('Game creation failed: ' + error.message);
     });
   }
 
   render() {
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
-          <PrimaryModal 
-            title='Creating A Game'
-            modalVisible={this.state.isModalVisible}
-            buttonText='Got It!'
-            onCloseModal={() => this.setState({isModalVisible: false})}
-            minHeight={Dimensions.get('screen').height/5}
-            content={
-              <Text style={styles.modalContent}>
-                {modalStart.CREATE}
-              </Text>
-            }
-          />
-          <View style={styles.mainView}>
-            <Text style={styles.title}>Create Game</Text>
-            <View style={styles.errorBox}>
-              <Text style={styles.error}>{this.state.error}</Text>
+      <LoadingPage 
+        loadingText={"Creating Game..."}
+        isLoading={this.state.isLoading}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.container}>
+            <PrimaryModal 
+              title='Creating A Game'
+              modalVisible={this.state.isModalVisible}
+              buttonText='Got It!'
+              onCloseModal={() => this.setState({isModalVisible: false})}
+              minHeight={Dimensions.get('screen').height/5}
+              content={
+                <Text style={styles.modalContent}>
+                  {modalStart.CREATE}
+                </Text>
+              }
+            />
+            <View style={styles.mainView}>
+              <Text style={styles.title}>Create Game</Text>
+              <View style={styles.errorBox}>
+                <Text style={styles.error}>{this.state.error}</Text>
+              </View>
+              <PrimaryTextInput 
+                autoCorrect={false}
+                marginBottom={10}
+                onChangeText={text=>this.updateName(text)}
+                placeholder={'Your Name'}
+                value={this.state.name}
+              />
+              <PrimaryTextInput 
+                autoCorrect={false}
+                keyboardType={'number-pad'}
+                onChangeText={text=>this.updateWordCount(text)}
+                placeholder={'Words Per Person'}
+                value={this.state.wordCount}
+              />
+              <PrimaryButton
+                text={'Create'}
+                onPress={()=>this.pressSubmit()}
+                disabled={this.state.disableButton}
+              />
+              <TouchableOpacity 
+                style={styles.questionTag}
+                onPress={() => this.setState({isModalVisible: true})}
+              > 
+                <Text style={styles.questionTagText}>Need Help?</Text>
+              </TouchableOpacity>
             </View>
-            <PrimaryTextInput 
-              autoCorrect={false}
-              marginBottom={10}
-              onChangeText={text=>this.updateName(text)}
-              placeholder={'Your Name'}
-              value={this.state.name}
-            />
-            <PrimaryTextInput 
-              autoCorrect={false}
-              keyboardType={'number-pad'}
-              onChangeText={text=>this.updateWordCount(text)}
-              placeholder={'Words Per Person'}
-              value={this.state.wordCount}
-            />
-            <PrimaryButton
-              text={'Create'}
-              onPress={()=>this.pressSubmit()}
-              disabled={this.state.disableButton}
-            />
-            <TouchableOpacity 
-              style={styles.questionTag}
-              onPress={() => this.setState({isModalVisible: true})}
-            > 
-              <Text style={styles.questionTagText}>Need Help?</Text>
-            </TouchableOpacity>
+            <View style={styles.backButtonView}>
+              <BackButton 
+                onPress={()=> {
+                  this.db.logEvent(Events.BACK_BUTTON, {
+                    screen: 'create',
+                    purpose: 'User on create page clicked to go back to lobby'
+                  })
+                  this.props.changeScreen(Screens.HOME)
+                }}
+                margin={Dimensions.get('screen').width/15}
+              />
+            </View>
           </View>
-          <View style={styles.backButtonView}>
-            <BackButton 
-              onPress={()=> {
-                this.db.logEvent(Events.BACK_BUTTON, {
-                  screen: 'create',
-                  purpose: 'User on create page clicked to go back to lobby'
-                })
-                this.props.changeScreen(Screens.HOME)
-              }}
-              margin={Dimensions.get('screen').width/15}
-            />
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </LoadingPage>
     );
   }
 }
