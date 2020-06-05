@@ -14,10 +14,11 @@ import PrimaryModal from '../components/primitives/PrimaryModal';
 import LoadingPage from '../components/primitives/LoadingPage';
 import rand from 'random-seed';
 import Screens from '../constants/Screens';
-import { gameIDLength } from '../constants/Structures';
+import { gameIDLength, gameExpirationLength } from '../constants/Structures';
 import { modalStart } from '../constants/ModalContent';
 import Events from '../constants/Events';
 import Fire from '../Fire';
+import { validateGame } from '../global/GlobalFunctions';
 
 class Create extends Component {
   state = {
@@ -75,6 +76,35 @@ class Create extends Component {
     this.setState({wordCount: updateWordCount});
   }
 
+  async cleanDatabase() {
+    try {
+      let gameExpiredTimestamp = Date.now() - gameExpirationLength;
+      let gameRef = this.db.getRef('games');
+      let oldGames = await gameRef.orderByChild("timestamp").endAt(gameExpiredTimestamp).once("value");
+      console.log(`Games older than this will be deleted: ${(new Date(gameExpiredTimestamp).toString())}`);
+      if (oldGames.val() !== null) {
+        const IDs = Object.keys(oldGames.val());
+        let validGameIDs = [];
+        IDs.forEach((ID) => {
+          if (validateGame(oldGames.val()[ID])) {
+            validGameIDs.push(ID);
+            console.log(`${ID}: ${(new Date(oldGames.val()[ID].timestamp)).toString()}`);
+          }
+        })
+        validGameIDs.forEach(validID => {
+          this.db.getRef(`games/${validID}`).remove();
+          this.db.getRef(`players/${validID}`).remove();
+          this.db.getRef(`words/${validID}`).remove();
+        })
+      }
+    }
+    catch(err) {
+      console.log("Unable to properly clean database")
+      console.log(err)
+      return
+    }
+  }
+
   async pressSubmit() {
     Keyboard.dismiss();
 
@@ -101,35 +131,63 @@ class Create extends Component {
       screen: 'create',
       purpose: 'Create new game'
     })
-    let gameRef = this.db.getRef('games');
-    gameRef.child(newGameID).set({ 
-      'timestamp': Date.now(),
-      'round': '',
-      'wordsPerPerson': Number(this.state.wordCount),
-      'status': Screens.LOBBY,
-      'currentPlayer': '',
-      'turnStartTimestamp': '',
-      'score': {'team1': 0, 'team2': 0},
-      'turnTime': 60000
-    })
-    .then(() => {
+    try {
+      let gameRef = this.db.getRef('games');
+      await gameRef.child(newGameID).set({ 
+        'timestamp': Date.now(),
+        'round': '',
+        'wordsPerPerson': Number(this.state.wordCount),
+        'status': Screens.LOBBY,
+        'currentPlayer': '',
+        'turnStartTimestamp': '',
+        'score': {'team1': 0, 'team2': 0},
+        'turnTime': 60000
+      })
       console.log(`Game created. ID: ${newGameID}`);
       // Add host to game
-      this.db.getRef(`players/${newGameID}`).push(this.state.name.trim())
-      .then((value) => {
-        this.props.setPlayerID(value.key)
-        // Add player to 'waiting' state to indicate (to others) they haven't submitted words
-        this.db.getRef(`games/${newGameID}/waiting/${value.key}`).set(this.state.name.trim());
-        this.db.getRef(`games/${newGameID}/host`).set({[value.key]: this.state.name.trim()});
-        this.props.updateName(this.state.name.trim());
-        this.props.updateGameID(newGameID);
-        this.props.changeScreen(Screens.LOBBY);
-      });
-    })
-    .catch((error) => {
+      let ref = await this.db.getRef(`players/${newGameID}`).push(this.state.name.trim())
+      this.props.setPlayerID(ref.key)
+      // Add player to 'waiting' state to indicate (to others) they haven't submitted words
+      this.db.getRef(`games/${newGameID}/waiting/${ref.key}`).set(this.state.name.trim());
+      this.db.getRef(`games/${newGameID}/host`).set({[ref.key]: this.state.name.trim()});
+      this.props.updateName(this.state.name.trim());
+      this.props.updateGameID(newGameID);
+      await this.cleanDatabase();
+      this.props.changeScreen(Screens.LOBBY);
+    } 
+    catch (error) {
       this.setState({ disableButton: false, isLoading: false });
       console.log('Game creation failed: ' + error.message);
-    });
+    }
+
+    // gameRef.child(newGameID).set({ 
+    //   'timestamp': Date.now(),
+    //   'round': '',
+    //   'wordsPerPerson': Number(this.state.wordCount),
+    //   'status': Screens.LOBBY,
+    //   'currentPlayer': '',
+    //   'turnStartTimestamp': '',
+    //   'score': {'team1': 0, 'team2': 0},
+    //   'turnTime': 60000
+    // })
+    // .then(() => {
+    //   console.log(`Game created. ID: ${newGameID}`);
+    //   // Add host to game
+    //   this.db.getRef(`players/${newGameID}`).push(this.state.name.trim())
+    //   .then((value) => {
+    //     this.props.setPlayerID(value.key)
+    //     // Add player to 'waiting' state to indicate (to others) they haven't submitted words
+    //     this.db.getRef(`games/${newGameID}/waiting/${value.key}`).set(this.state.name.trim());
+    //     this.db.getRef(`games/${newGameID}/host`).set({[value.key]: this.state.name.trim()});
+    //     this.props.updateName(this.state.name.trim());
+    //     this.props.updateGameID(newGameID);
+    //     this.props.changeScreen(Screens.LOBBY);
+    //   });
+    // })
+    // .catch((error) => {
+    //   this.setState({ disableButton: false, isLoading: false });
+    //   console.log('Game creation failed: ' + error.message);
+    // });
   }
 
   render() {

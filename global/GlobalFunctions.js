@@ -20,3 +20,7 @@ export const isValidSnapshot = (snapshot, errorCode) => {
 export const getCurrentTimestamp = () => {
   return firebase.firestore.Timestamp.now();
 }
+
+export const validateGame = (game) => {
+  return (!!game.timestamp && typeof game.timestamp === "number")
+}
