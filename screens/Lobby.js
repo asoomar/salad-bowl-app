@@ -41,7 +41,7 @@ class Lobby extends Component {
       {key: '', word: ''}
     ],
     wordCount: 0,
-    wordsPerPlayer: 2, // Default if words per player is not set
+    wordsPerPlayer: 0, // Default if words per player is not set
     currentSegment: 'Your Words',
     disableSubmitWords: false,
     disableLeaveGame: false,
@@ -352,7 +352,7 @@ class Lobby extends Component {
       );
 
     let yourWords = this.state.editWords
-      ? <YourWords 
+      ? <YourWords
         words={this.state.words}
         wordsPerPlayer={this.state.wordsPerPlayer}
         onWordChange={(text, wordNum) => this.updateWord(text, wordNum)}
@@ -367,13 +367,15 @@ class Lobby extends Component {
         <ScrollView>
           <View style={styles.myWords}>
             {this.state.words.map((wordObject,i) => {
-              return (
-              <Text 
-                key={NumberRanks[i]}
-                style={styles.myWord}
-              >
-                {wordObject.word}
-              </Text>)
+              if (i < this.state.wordsPerPlayer) {
+                return (
+                  <Text 
+                    key={NumberRanks[i]}
+                    style={styles.myWord}
+                  >
+                    {wordObject.word}
+                  </Text>)
+              }
             })}
             <PrimaryButton 
               text='Edit Words'
@@ -583,7 +585,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 10
+    paddingTop: 10,
   },
   myWord: {
     fontSize: Dimensions.get('screen').height/30,

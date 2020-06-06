@@ -4,6 +4,7 @@ import Screens from '../constants/Screens';
 import Events from '../constants/Events';
 import Fire from '../Fire';
 import PrimaryButton from '../components/primitives/PrimaryButton';
+import LoadingPage from '../components/primitives/LoadingPage';
 import { isValidSnapshot} from '../global/GlobalFunctions';
 
 class Finish extends Component {
@@ -101,31 +102,31 @@ class Finish extends Component {
     const team2Style = this.props.team === 1 ? null : styles.opposing
 
     return (
-      <View style={styles.container}>
-        {loading ? <Text style={styles.message}> Loading... </Text> : 
-          <>
-            <View style={styles.body}>
-              <Text style={styles.message}>{message}</Text> 
-              <View style={styles.score}>
-                <View style={styles.teamScore}>
-                  <Text style={[styles.points, team1Style]}>{team1Score}</Text>
-                  <Text style={[styles.team, team1Style]}>Team 1</Text> 
-                </View>
-                <View style={styles.teamScore}>
-                  <Text style={[styles.points, team2Style]}>{team2Score}</Text>
-                  <Text style={[styles.team, team2Style]}>Team 2</Text>
-                </View>
+      <LoadingPage
+        loadingText={"Wrapping Up Game..."}
+        isLoading={loading}>
+        <View style={styles.container}>
+          <View style={styles.body}>
+            <Text style={styles.message}>{message}</Text> 
+            <View style={styles.score}>
+              <View style={styles.teamScore}>
+                <Text style={[styles.points, team1Style]}>{team1Score}</Text>
+                <Text style={[styles.team, team1Style]}>Team 1</Text> 
+              </View>
+              <View style={styles.teamScore}>
+                <Text style={[styles.points, team2Style]}>{team2Score}</Text>
+                <Text style={[styles.team, team2Style]}>Team 2</Text>
               </View>
             </View>
-            <View style={styles.footer}>
-              <PrimaryButton 
-                text="Go Home" 
-                onPress={() => this.goHome()}
-              />
-            </View>
-          </>
-        }
-      </View>
+          </View>
+          <View style={styles.footer}>
+            <PrimaryButton 
+              text="Go Home" 
+              onPress={() => this.goHome()}
+            />
+          </View>
+        </View>
+      </LoadingPage>
     );
   }
 }

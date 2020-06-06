@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View, Dimensions, ScrollView } from 'react-native';
 import PrimaryButton from '../components/primitives/PrimaryButton';
+import Loader from '../components/primitives/Loader';
 import Screens from '../constants/Screens';
 import Events from '../constants/Events';
 import Fire from '../Fire';
@@ -120,16 +121,20 @@ class Teams extends Component {
           <Text style={styles.title}>Teams</Text> 
         </View>
         <View style={styles.body}> 
-          <ScrollView contentContainerStyle={styles.scroll}>
-            <View style={styles.team}>
-              <Text style={styles.teamName}>Team 1</Text> 
-              {teamOne}
-            </View>
-            <View style={styles.team}>
-              <Text style={styles.teamName}>Team 2</Text> 
-              {teamTwo}
-            </View>
-          </ScrollView>
+          <Loader
+              isLoading={this.state.team1.length === 0} 
+          >
+            <ScrollView contentContainerStyle={styles.scroll}>
+              <View style={styles.team}>
+                <Text style={styles.teamName}>Team 1</Text> 
+                {teamOne}
+              </View> 
+              <View style={styles.team}>
+                <Text style={styles.teamName}>Team 2</Text> 
+                {teamTwo}
+              </View>
+            </ScrollView>
+          </Loader>
         </View>
         <View style={styles.footer}>
           {this.props.playerID === this.state.host.id

@@ -159,35 +159,6 @@ class Create extends Component {
       this.setState({ disableButton: false, isLoading: false });
       console.log('Game creation failed: ' + error.message);
     }
-
-    // gameRef.child(newGameID).set({ 
-    //   'timestamp': Date.now(),
-    //   'round': '',
-    //   'wordsPerPerson': Number(this.state.wordCount),
-    //   'status': Screens.LOBBY,
-    //   'currentPlayer': '',
-    //   'turnStartTimestamp': '',
-    //   'score': {'team1': 0, 'team2': 0},
-    //   'turnTime': 60000
-    // })
-    // .then(() => {
-    //   console.log(`Game created. ID: ${newGameID}`);
-    //   // Add host to game
-    //   this.db.getRef(`players/${newGameID}`).push(this.state.name.trim())
-    //   .then((value) => {
-    //     this.props.setPlayerID(value.key)
-    //     // Add player to 'waiting' state to indicate (to others) they haven't submitted words
-    //     this.db.getRef(`games/${newGameID}/waiting/${value.key}`).set(this.state.name.trim());
-    //     this.db.getRef(`games/${newGameID}/host`).set({[value.key]: this.state.name.trim()});
-    //     this.props.updateName(this.state.name.trim());
-    //     this.props.updateGameID(newGameID);
-    //     this.props.changeScreen(Screens.LOBBY);
-    //   });
-    // })
-    // .catch((error) => {
-    //   this.setState({ disableButton: false, isLoading: false });
-    //   console.log('Game creation failed: ' + error.message);
-    // });
   }
 
   render() {

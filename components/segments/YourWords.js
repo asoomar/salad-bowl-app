@@ -9,6 +9,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview-cu
 import PrimaryTextInput from '../primitives/PrimaryTextInput';
 import PrimaryButton from '../primitives/PrimaryButton';
 import NumberRanks from '../../constants/NumberRanks';
+import Loader from '../primitives/Loader';
 import PropTypes from 'prop-types';
 
 class YourWords extends Component {
@@ -16,32 +17,38 @@ class YourWords extends Component {
     return (
       <KeyboardAwareScrollView>
         <View style={styles.mainView}>
-          {this.props.words.map((wordObject,i) => {
-            if (i < this.props.wordsPerPlayer) {
-              return (
-                <PrimaryTextInput 
-                  key={NumberRanks[i]}
-                  autoCorrect={true}
-                  marginTop={10}
-                  onChangeText={text => this.props.onWordChange(text, i)}
-                  placeholder={`${NumberRanks[i]} Word`}
-                  placeholderTextColor={this.props.placeholderTextColor}
-                  returnKeyType='default'
-                  style={this.props.style}
-                  value={wordObject.word}
-                />
-              )}
-          })}
-          <View style={styles.errorBox}>
-            <Text style={styles.error}>{this.props.error}</Text>
-          </View> 
-          <PrimaryButton
-            text={'Submit Words'}
-            onPress={() => this.props.onSubmit()}
-            buttonStyle={styles.submitButton}
-            textStyle={styles.submitButtonText}
-            disabled={this.props.disabled}
-          />
+          <Loader
+            isLoading={this.props.wordsPerPlayer === 0}
+          >
+            {this.props.words.map((wordObject,i) => {
+              if (i < this.props.wordsPerPlayer) {
+                return (
+                  <PrimaryTextInput 
+                    key={NumberRanks[i]}
+                    autoCorrect={true}
+                    marginTop={10}
+                    onChangeText={text => this.props.onWordChange(text, i)}
+                    placeholder={`${NumberRanks[i]} Word`}
+                    placeholderTextColor={this.props.placeholderTextColor}
+                    returnKeyType='default'
+                    style={this.props.style}
+                    value={wordObject.word}
+                  />
+                )}
+            })}
+            {this.props.error !== '' 
+            ? <View style={styles.errorBox}>
+                <Text style={styles.error}>{this.props.error}</Text>
+              </View>
+            : null}
+            <PrimaryButton
+              text={'Submit Words'}
+              onPress={() => this.props.onSubmit()}
+              buttonStyle={styles.submitButton}
+              textStyle={styles.submitButtonText}
+              disabled={this.props.disabled}
+            />
+          </Loader>
         </View>
       </KeyboardAwareScrollView>
     );
