@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Dimensions, TextInput } from 'react-native';
+import { StyleSheet, Dimensions, TextInput, View } from 'react-native';
 import PropTypes from 'prop-types';
 
 PrimaryTextInput.propTypes = {
@@ -17,6 +17,7 @@ PrimaryTextInput.propTypes = {
   returnKeyType: PropTypes.string,
   onSubmitEditing: PropTypes.func,
   focus: PropTypes.bool,
+  multiline: PropTypes.bool,
 }
 
 export default function PrimaryTextInput(props) {
@@ -25,6 +26,26 @@ export default function PrimaryTextInput(props) {
   if (props.marginTop) viewStyling.marginTop = props.marginTop
 
   return(
+    props.multiline ? 
+    <View style={styles.multilineView}>
+      <TextInput
+        style={[styles.input, viewStyling, props.style]} 
+        autoCompleteType={"off"}
+        autoCorrect={props.autoCorrect}
+        autoCapitalize={props.autoCapitalize}
+        blurOnSubmit={true}
+        focus={props.focus ? props.focus : undefined}
+        multiline
+        onChangeText={text=>props.onChangeText(text)}
+        onFocus={props.onFocus ? () => props.onFocus() : () => {}}
+        onSubmitEditing={props.onSubmitEditing ? () => props.onSubmitEditing() : () => {}}
+        placeholder={props.placeholder}
+        placeholderTextColor={props.placeholderTextColor || '#1c18a8'}
+        keyboardType={props.keyboardType}
+        returnKeyType={props.returnKeyType ? props.returnKeyType : 'default'}
+        value={props.value}
+      />
+    </View> : 
     <TextInput
       style={[styles.input, viewStyling, props.style]} 
       autoCompleteType={"off"}
@@ -54,10 +75,17 @@ const styles = StyleSheet.create({
     borderRadius: Dimensions.get('screen').height,
     height: Dimensions.get('screen').height/12,
     display: 'flex',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     fontSize: Dimensions.get('screen').height/30,
     fontFamily: 'poppins-semibold',
     textAlign: 'center'
+  },
+  multilineView: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center'
   }
 });

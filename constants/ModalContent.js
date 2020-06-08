@@ -87,3 +87,27 @@ export const modalInstructionContent = {
   [7]: "You're now ready play Salad Bowl! Now it's time to create a game and " +
     "invite your friends!"  
 }
+
+export const feedbackModalTitles = {
+  FEEDBACK: "Giving Feedback",
+  SUCCESS: "Thanks!",
+  FAIL: "Uh Oh!",
+  HELP: "Submitting Feedback"
+}
+
+export const feedbackModalContent = {
+  FEEDBACK: "Help us improve Salad Bowl by telling us your experience " +
+    "with it! Let us know if you enjoy it or if there are some features " +
+    "that should be added. You can also take this chance to report any " +
+    "bugs or issues you have encountered.",
+  SUCCESS: "We really appreciate you taking the time to submit your " +
+    "feedback! This allows us to make the game better for everyone!",
+  FAIL: "For some reason, we could not submit your feedback. Please " +
+    "try again later.",
+  HELP: "In the first field, you should type your email for us to contact you. " +
+  "This is required just in case we need to reach out to you for more " +
+  "information. Don't worry, we won't spam you with emails! \n\n" +
+  "In the second field, add your feedback. You can tell us about your " +
+  "experience with Salad Bowl, feature requests, or bugs you've come " +
+  "across.",  
+}

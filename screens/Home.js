@@ -33,7 +33,14 @@ export default function Home(props) {
         onCloseModal={() => setShowInstructions(false)}
         modalVisible={showInstructions}
       />
-      <Text style={styles.versionText}>v{app.expo.version}</Text>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.feedbackButton}
+          onPress={() => props.changeScreen(Screens.FEEDBACK)}> 
+          <Text style={styles.feedbackText}>Give Feedback</Text>
+        </TouchableOpacity>
+        <Text style={styles.versionText}>v{app.expo.version}</Text>
+      </View>
       <View style={styles.titleView}>
         {isTitleImage 
         ? <Image style={styles.image} source={require('../assets/logo.png')} />
@@ -106,11 +113,28 @@ export default function Home(props) {
       color: '#ffffff66',
       textAlign: 'center',
     },
+    header: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: Dimensions.get('screen').height/40,
+    },
+    feedbackButton: {
+      flex: 1,
+    },
+    feedbackText: {
+      fontSize: Dimensions.get('screen').height/60,
+      fontFamily: 'poppins-semibold',
+      color: '#ffffff66',
+      paddingLeft: 20,
+      textAlign: 'left',
+    },
     versionText: {
+      flex: 1,
       fontSize: Dimensions.get('screen').height/60,
       fontFamily: 'poppins-italic',
       color: '#ffffff33',
-      minWidth: '100%',
       textAlign: 'right',
       paddingRight: 20,
       paddingLeft: 20

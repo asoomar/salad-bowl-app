@@ -6,7 +6,8 @@ const Screens = {
     LOBBY: 'lobby',
     TEAMS: 'teams',
     GAME: 'game',
-    FINISH: 'finish'
+    FINISH: 'finish',
+    FEEDBACK: 'feedback'
 }
 
 export default Screens;

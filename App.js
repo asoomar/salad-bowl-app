@@ -12,6 +12,7 @@ import Lobby from './screens/Lobby';
 import Teams from './screens/Teams';
 import Game from './screens/Game';
 import Finish from './screens/Finish';
+import Feedback from './screens/Feedback';
 import Fire from './Fire';
 
 const fetchFonts = async () => {
@@ -129,6 +130,14 @@ export default function App() {
           playerID={playerID}
           screenName={name}
           team={team}/> 
+        : null}
+
+      {/* FEEDBACK SCREEN */}
+      {currentScreen === Screens.FEEDBACK ? 
+        <Feedback
+          changeScreen={(screen) => setCurrentScreen(screen)}
+          homeMessage={forceHomeMessage}
+        /> 
         : null}
 
     </SafeAreaView>
