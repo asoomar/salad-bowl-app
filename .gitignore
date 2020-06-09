@@ -18,6 +18,7 @@ release_notes/*
 credentials/*
 constants/Ads.js
 constants/FirestoreValues.js
+testing.sh
 
 # misc
 nyx/node_modules/**/*
