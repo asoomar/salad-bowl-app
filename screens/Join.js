@@ -15,6 +15,8 @@ import { gameIDLength } from '../constants/Structures';
 import { modalStart } from '../constants/ModalContent';
 import Events from '../constants/Events';
 import Fire from '../Fire';
+import { AdMobRewarded, AdMobInterstitial } from 'expo-ads-admob';
+import Ads from '../constants/Ads';
 
 class Join extends Component {
   state = {
@@ -83,6 +85,14 @@ class Join extends Component {
       purpose: 'User entered details and clicked "Join"'
     })
     if (await this.canUserJoinGame(gameID)) {
+      if (Ads.showAds) {
+        // await AdMobRewarded.setAdUnitID(Ads.JoinGame.id.ios);
+        // await AdMobRewarded.requestAdAsync();
+        // await AdMobRewarded.showAdAsync();
+        await AdMobInterstitial.setAdUnitID(Ads.JoinGameAlt.id.ios);
+        await AdMobInterstitial.requestAdAsync();
+        await AdMobInterstitial.showAdAsync();
+      }
       this.props.updateName(this.state.name.trim());
       this.props.updateGameID(gameID);
       this.props.changeScreen(Screens.LOBBY);

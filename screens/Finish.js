@@ -7,6 +7,8 @@ import PrimaryButton from '../components/primitives/PrimaryButton';
 import LoadingPage from '../components/primitives/LoadingPage';
 import { isValidSnapshot} from '../global/GlobalFunctions';
 import { giveFeedbackContent } from '../constants/Content';
+import { AdMobInterstitial } from 'expo-ads-admob';
+import Ads from '../constants/Ads';
 
 class Finish extends Component {
   state = {
@@ -68,7 +70,7 @@ class Finish extends Component {
     }); 
   }
 
-  goHome() {
+  async goHome() {
     this.db.logEvent(Events.GO_HOME, {
       screen: 'finish',
       purpose: 'Game ended and user clicked to go home',
@@ -79,8 +81,19 @@ class Finish extends Component {
       this.checkIfLastToLeave();
     })
     .catch((error) => 'Failed to leave game: ' + error.message)
-    this.props.setHomeMessage(giveFeedbackContent);
-    this.props.changeScreen(Screens.HOME);
+    if (Ads.showAds) {
+      await AdMobInterstitial.setAdUnitID(Ads.FinishGoHome.id.ios);
+      await AdMobInterstitial.requestAdAsync();
+      await AdMobInterstitial.showAdAsync().then(() => {
+        setTimeout(() => {
+          this.props.setHomeMessage(giveFeedbackContent);
+          this.props.changeScreen(Screens.HOME)
+        }, 500)
+      });
+    } else {
+      this.props.setHomeMessage(giveFeedbackContent);
+      this.props.changeScreen(Screens.HOME);
+    }
   }
 
   render() {

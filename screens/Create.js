@@ -19,6 +19,8 @@ import { modalStart } from '../constants/ModalContent';
 import Events from '../constants/Events';
 import Fire from '../Fire';
 import { validateGame } from '../global/GlobalFunctions';
+import { AdMobRewarded, AdMobInterstitial } from 'expo-ads-admob';
+import Ads from '../constants/Ads';
 
 class Create extends Component {
   state = {
@@ -153,7 +155,18 @@ class Create extends Component {
       this.props.updateName(this.state.name.trim());
       this.props.updateGameID(newGameID);
       await this.cleanDatabase();
-      this.props.changeScreen(Screens.LOBBY);
+      if (Ads.showAds) {
+        // await AdMobRewarded.setAdUnitID(Ads.CreateGame.id.ios);
+        // await AdMobRewarded.requestAdAsync();
+        // await AdMobRewarded.showAdAsync();
+        await AdMobInterstitial.setAdUnitID(Ads.CreateGameAlt.id.ios);
+        await AdMobInterstitial.requestAdAsync();
+        await AdMobInterstitial.showAdAsync().then(() => {
+          setTimeout(() => {this.props.changeScreen(Screens.LOBBY)}, 500)
+        });
+      } else {
+        this.props.changeScreen(Screens.LOBBY);
+      }
     } 
     catch (error) {
       this.setState({ disableButton: false, isLoading: false });
