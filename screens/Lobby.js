@@ -406,13 +406,14 @@ class Lobby extends Component {
           textStyle={styles.leaveButtonText}
           disabled={this.state.disableLeaveGame}
         />
+        {Ads.showAds ? 
         <View style={styles.adView}>
           <AdMobBanner
             bannerSize="mediumRectangle"
             adUnitID={Ads.LobbyMorePane.id.ios}
             servePersonalizedAds
           />
-        </View>
+        </View> : null}
       </View>
     )
     

@@ -31,6 +31,12 @@ class Feedback extends Component {
 
   componentDidMount() {
     this.db = Fire.db;
+    this.setState({
+      showModal: true,
+      modalText: feedbackModalContent.FEEDBACK,
+      modalTitle: feedbackModalTitles.FEEDBACK,
+      modalStyle: styles.modalContentCenter
+    })
   }
 
   componentWillUnmount() {

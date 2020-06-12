@@ -6,6 +6,7 @@ import Fire from '../Fire';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import LoadingPage from '../components/primitives/LoadingPage';
 import { isValidSnapshot} from '../global/GlobalFunctions';
+import { giveFeedbackContent } from '../constants/Content';
 
 class Finish extends Component {
   state = {
@@ -78,6 +79,7 @@ class Finish extends Component {
       this.checkIfLastToLeave();
     })
     .catch((error) => 'Failed to leave game: ' + error.message)
+    this.props.setHomeMessage(giveFeedbackContent);
     this.props.changeScreen(Screens.HOME);
   }
 

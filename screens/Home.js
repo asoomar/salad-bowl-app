@@ -4,6 +4,7 @@ import Screens from '../constants/Screens';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import PrimaryModal from '../components/primitives/PrimaryModal';
 import InstructionsModal from '../components/segments/InstructionsModal';
+import { giveFeedbackContent } from '../constants/Content';
 import * as app from '../app.json';
 
 const isTitleImage = true
@@ -15,13 +16,22 @@ export default function Home(props) {
   props.updateGameID('');
   props.updateTeam(-1);
 
+  const isFeedbackMessage = props.homeMessage === giveFeedbackContent;
   return (
     <View style={styles.container}>
       <PrimaryModal 
-        onCloseModal={() => props.setHomeMessage(null)}
+        onCloseModal={() => {
+          if (isFeedbackMessage) {
+            setTimeout(() => {props.changeScreen(Screens.FEEDBACK)}, 500)
+          } 
+          props.setHomeMessage(null)
+        }}
+        onCancel={isFeedbackMessage ? () => props.setHomeMessage(null) : undefined}
         modalVisible={!!props.homeMessage}
-        title="Uh Oh!"
+        title={isFeedbackMessage ? "Give Us Feedback" : "Uh Oh!"}
         buttonText="Okay"
+        twoButtons={isFeedbackMessage}
+        secondaryButtonText={isFeedbackMessage ? "Later" : undefined}
         minHeight={Dimensions.get('screen').height/10}
         content={
           <Text style={styles.modalText}>

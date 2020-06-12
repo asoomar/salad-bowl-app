@@ -48,7 +48,8 @@ class PrimaryModal extends Component {
                   <PrimaryButton 
                     buttonStyle={styles.buttonStyleSecondary}
                     textStyle={styles.buttonTextSecondary}
-                    text={"Cancel"}
+                    text={this.props.secondaryButtonText 
+                      ? this.props.secondaryButtonText : "Cancel"}
                     onPress={() => this.props.onCancel()}
                   />
                 </View>
@@ -79,6 +80,7 @@ PrimaryModal.propTypes = {
   content: PropTypes.element.isRequired,
   modalVisible: PropTypes.bool.isRequired,
   buttonText: PropTypes.string.isRequired,
+  secondaryButtonText: PropTypes.string,
   onCloseModal: PropTypes.func.isRequired,
   minHeight: PropTypes.number,
   titleHeight: PropTypes.number,

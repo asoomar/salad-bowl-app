@@ -136,7 +136,6 @@ export default function App() {
       {currentScreen === Screens.FEEDBACK ? 
         <Feedback
           changeScreen={(screen) => setCurrentScreen(screen)}
-          homeMessage={forceHomeMessage}
         /> 
         : null}
 
