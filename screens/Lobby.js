@@ -159,19 +159,6 @@ class Lobby extends Component {
     .finally(()=> {
         this.props.changeScreen(Screens.HOME)
     });
-    // try {
-    //   await this.resetHost();
-    //   await this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}`).remove()
-    //   console.log(`${this.props.playerID} (${this.props.screenName}) was removed from the game`);
-    //   await this.removeUserWaiting();
-    //   await this.removeUserWords();
-    //   await this.checkIfLastToLeave();
-    //   this.props.changeScreen(Screens.HOME)
-    // }
-    // catch (error) {
-    //   console.log('Remove failed: ' + error.message)
-    //   this.props.changeScreen(Screens.HOME)
-    // } 
   }
 
   async resetHost() {
