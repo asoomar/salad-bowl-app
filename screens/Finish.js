@@ -13,10 +13,12 @@ import Ads from '../constants/Ads';
 class Finish extends Component {
   state = {
     team1Score: null,
-    team2Score: null
+    team2Score: null,
+    isAdLoaded: false,
+    bypassAd: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.db = Fire.db;
 
     this.db.getRef(`games/${this.props.gameID}/score`).once('value', (snapshot) => {
@@ -39,6 +41,44 @@ class Finish extends Component {
       this.setState({team1Score: team1Pts, team2Score: team2Pts});
     });
 
+    // Don't show ads for now
+    if (false) {
+      if (await AdMobInterstitial.getIsReadyAsync()) {
+        this.setState({isAdLoaded: true})
+      } else {
+        AdMobInterstitial.setAdUnitID(Ads.FinishGoHome.id.ios)
+        AdMobInterstitial.requestAdAsync();
+      }
+      AdMobInterstitial.addEventListener('interstitialDidLoad', () => {
+        console.log('Finish Game Ad Loaded')
+        this.setState({isAdLoaded: true})
+      });
+      AdMobInterstitial.addEventListener('interstitialDidFailToLoad', () => {
+        console.log('Finish Game Ad Failed to Load')
+        this.setState({bypassAd: true})
+      });
+      AdMobInterstitial.addEventListener('interstitialDidClose', () => {
+        console.log('Finish Game Ad Closed')
+        this.props.setHomeMessage(giveFeedbackContent);
+        this.props.changeScreen(Screens.HOME);
+      });
+    }
+
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      team1Score: null,
+      team2Score: null,
+      isAdLoaded: false,
+      bypassAd: false
+    }) 
+    // Don't show ads for now
+    if (false) {
+      AdMobInterstitial.removeEventListener('interstitialDidLoad');
+      AdMobInterstitial.removeEventListener('interstitialDidFailToLoad');
+      AdMobInterstitial.removeEventListener('interstitialDidClose');
+    }   
   }
 
   // Delete the game we just left
@@ -81,15 +121,9 @@ class Finish extends Component {
       this.checkIfLastToLeave();
     })
     .catch((error) => 'Failed to leave game: ' + error.message)
-    if (Ads.showAds) {
-      await AdMobInterstitial.setAdUnitID(Ads.FinishGoHome.id.ios);
-      await AdMobInterstitial.requestAdAsync();
-      await AdMobInterstitial.showAdAsync().then(() => {
-        setTimeout(() => {
-          this.props.setHomeMessage(giveFeedbackContent);
-          this.props.changeScreen(Screens.HOME)
-        }, 500)
-      });
+    // Don't show ads for now
+    if (false) {
+      AdMobInterstitial.showAdAsync()
     } else {
       this.props.setHomeMessage(giveFeedbackContent);
       this.props.changeScreen(Screens.HOME);

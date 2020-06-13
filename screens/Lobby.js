@@ -424,7 +424,6 @@ class Lobby extends Component {
           <AdMobBanner
             bannerSize="mediumRectangle"
             adUnitID={Ads.LobbyMorePane.id.ios}
-            servePersonalizedAds
           />
         </View> : null}
       </View>

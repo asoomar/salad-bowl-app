@@ -17,6 +17,7 @@ import Events from '../constants/Events';
 import Fire from '../Fire';
 import { AdMobRewarded, AdMobInterstitial } from 'expo-ads-admob';
 import Ads from '../constants/Ads';
+import { stubFalse } from 'lodash';
 
 class Join extends Component {
   state = {
@@ -26,14 +27,46 @@ class Join extends Component {
     disableButton: false,
     isModalVisible: false,
     isLoading: false,
+    isAdLoaded: false,
+    bypassAd: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.db = Fire.db;
+    if (Ads.showAds) {
+      AdMobInterstitial.setAdUnitID(Ads.JoinGameAlt.id.ios);
+      if (await AdMobInterstitial.getIsReadyAsync()) {
+        this.setState({isAdLoaded: true})
+      } else {
+        AdMobInterstitial.requestAdAsync();
+      }
+      AdMobInterstitial.addEventListener('interstitialDidLoad', () => {
+        console.log('Join Game Ad Loaded')
+        this.setState({isAdLoaded: true})
+      });
+      AdMobInterstitial.addEventListener('interstitialDidFailToLoad', () => {
+        console.log('Join Game Ad Failed to Load')
+        this.setState({bypassAd: true})
+      });
+      AdMobInterstitial.addEventListener('interstitialDidClose', () => {
+        console.log('Join Game Ad Closed')
+        this.props.changeScreen(Screens.LOBBY);
+      });
+    }
   }
 
   componentWillUnmount() {
-    this.setState({ disableButton: false, isLoading: false })
+    this.setState({ 
+      disableButton: false, 
+      isLoading: false, 
+      isAdLoaded: false, 
+      bypassAd: false
+    })
+    if (Ads.showAds) {
+      AdMobInterstitial.removeEventListener('interstitialDidLoad');
+      AdMobInterstitial.removeEventListener('interstitialDidFailToLoad');
+      AdMobInterstitial.removeEventListener('interstitialDidClose');
+    }   
   }
 
   async canUserJoinGame(gameID) { 
@@ -85,18 +118,19 @@ class Join extends Component {
       purpose: 'User entered details and clicked "Join"'
     })
     if (await this.canUserJoinGame(gameID)) {
-      if (Ads.showAds) {
-        // await AdMobRewarded.setAdUnitID(Ads.JoinGame.id.ios);
-        // await AdMobRewarded.requestAdAsync();
-        // await AdMobRewarded.showAdAsync();
-        await AdMobInterstitial.setAdUnitID(Ads.JoinGameAlt.id.ios);
-        await AdMobInterstitial.requestAdAsync();
-        await AdMobInterstitial.showAdAsync();
+      if (Ads.showAds && this.state.isAdLoaded && !this.state.bypassAd) {
+        this.finalizeJoin(this.state.name.trim(), gameID)
+        AdMobInterstitial.showAdAsync()
+      } else {
+        this.finalizeJoin(this.state.name.trim(), gameID)
+        this.props.changeScreen(Screens.LOBBY);
       }
-      this.props.updateName(this.state.name.trim());
-      this.props.updateGameID(gameID);
-      this.props.changeScreen(Screens.LOBBY);
     }
+  }
+
+  finalizeJoin(name, gameID) {
+    this.props.updateName(name);
+    this.props.updateGameID(gameID);
   }
 
   render() {

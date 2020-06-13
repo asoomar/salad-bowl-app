@@ -23,21 +23,58 @@ import { AdMobRewarded, AdMobInterstitial } from 'expo-ads-admob';
 import Ads from '../constants/Ads';
 
 class Create extends Component {
-  state = {
-    name: '',
-    wordCount: '',
-    error: '',
-    disableButton: false,
-    isModalVisible: false,
-    isLoading: false,
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: '',
+      wordCount: '',
+      error: '',
+      disableButton: false,
+      isModalVisible: false,
+      isLoading: false,
+      isAdLoaded: false,
+      bypassAd: false,
+    }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.db = Fire.db;
+    AdMobInterstitial.setAdUnitID(Ads.CreateGameAlt.id.ios);
+    if (Ads.showAds) {
+      if (await AdMobInterstitial.getIsReadyAsync()) {
+        this.setState({isAdLoaded: true})
+      } else {
+        AdMobInterstitial.requestAdAsync();
+      }
+      AdMobInterstitial.addEventListener('interstitialDidLoad', () => {
+        console.log('Create Game Ad Loaded')
+        this.setState({isAdLoaded: true})
+      });
+      AdMobInterstitial.addEventListener('interstitialDidFailToLoad', () => {
+        console.log('Create Game Ad Failed to Load')
+        this.setState({bypassAd: true})
+      });
+      AdMobInterstitial.addEventListener('interstitialDidClose', () => {
+        console.log('Create Game Ad Closed')
+        this.props.changeScreen(Screens.LOBBY)
+      });
+    }
   }
 
   componentWillUnmount() {
-    this.setState({ disableButton: false, isLoading: false })
+    this.setState({
+      name: '',
+      wordCount: '',
+      error: '', 
+      disableButton: false, 
+      isLoading: false, 
+      isAdLoaded: false,
+      bypassAd: false}) 
+    if (Ads.showAds) {
+      AdMobInterstitial.removeEventListener('interstitialDidLoad');
+      AdMobInterstitial.removeEventListener('interstitialDidFailToLoad');
+      AdMobInterstitial.removeEventListener('interstitialDidClose');
+    }   
   }
 
   //Returns true if the game id is invalid (already exists)
@@ -155,15 +192,8 @@ class Create extends Component {
       this.props.updateName(this.state.name.trim());
       this.props.updateGameID(newGameID);
       await this.cleanDatabase();
-      if (Ads.showAds) {
-        // await AdMobRewarded.setAdUnitID(Ads.CreateGame.id.ios);
-        // await AdMobRewarded.requestAdAsync();
-        // await AdMobRewarded.showAdAsync();
-        await AdMobInterstitial.setAdUnitID(Ads.CreateGameAlt.id.ios);
-        await AdMobInterstitial.requestAdAsync();
-        await AdMobInterstitial.showAdAsync().then(() => {
-          setTimeout(() => {this.props.changeScreen(Screens.LOBBY)}, 500)
-        });
+      if (Ads.showAds && this.state.isAdLoaded && !this.state.bypassAd) {
+        await AdMobInterstitial.showAdAsync();
       } else {
         this.props.changeScreen(Screens.LOBBY);
       }
