@@ -49,6 +49,9 @@ class Lobby extends Component {
     showHostModal: true,
     showInstructions: false,
     showConfirmLeave: false,
+
+    // Needed because the host gets reset twice if they leave game
+    wasHost: false, 
   }
 
   componentDidMount() {
@@ -81,11 +84,16 @@ class Lobby extends Component {
         return
       }
       if (snapshot.val() === "") {
-        this.props.setHomeMessage("The game ended because the host left");
-        this.goHome();
+        if (!this.state.wasHost) {
+          this.props.setHomeMessage("The game ended because the host left");
+          this.goHome();
+        }
       } else {
         let host = Object.entries(snapshot.val())[0];
         this.setState({host: {name: host[1], id: host[0]}});
+        if (this.props.playerID === host[0]) {
+          this.setState({wasHost: true});
+        }
       }
     });
 
@@ -117,7 +125,7 @@ class Lobby extends Component {
 
   }
 
-  async componentWillUnmount() {
+  componentWillUnmount() {
     this.db.getRef(`players/${this.props.gameID}`).off();
     this.db.getRef(`words/${this.props.gameID}`).off();
     this.db.getRef(`games/${this.props.gameID}/waiting`).off();
@@ -151,13 +159,31 @@ class Lobby extends Component {
     .finally(()=> {
         this.props.changeScreen(Screens.HOME)
     });
+    // try {
+    //   await this.resetHost();
+    //   await this.db.getRef(`players/${this.props.gameID}/${this.props.playerID}`).remove()
+    //   console.log(`${this.props.playerID} (${this.props.screenName}) was removed from the game`);
+    //   await this.removeUserWaiting();
+    //   await this.removeUserWords();
+    //   await this.checkIfLastToLeave();
+    //   this.props.changeScreen(Screens.HOME)
+    // }
+    // catch (error) {
+    //   console.log('Remove failed: ' + error.message)
+    //   this.props.changeScreen(Screens.HOME)
+    // } 
   }
 
   async resetHost() {
     if (this.props.playerID === this.state.host.id) {
-      this.db.getRef(`games/${this.props.gameID}/host`).set('')
-      .then(() => console.log("Host was reset"))
-      .catch((err) => console.log("Could not reset host: " + err))
+      try {
+        await this.db.getRef(`games/${this.props.gameID}/host`).set('')
+        console.log(`Host was reset by ${this.props.screenName}`)
+        // this.setState({wasHost: false})
+      }
+      catch (err) {
+        console.log("Could not reset host: " + err)
+      }
     }
   }
 
