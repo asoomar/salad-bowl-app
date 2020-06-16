@@ -38,6 +38,7 @@ class Create extends Component {
   }
 
   async componentDidMount() {
+    console.log('On create page')
     this.db = Fire.db;
     AdMobInterstitial.setAdUnitID(Ads.CreateGameAlt.id.ios);
     if (Ads.showAds) {
@@ -58,6 +59,11 @@ class Create extends Component {
         console.log('Create Game Ad Closed')
         this.props.changeScreen(Screens.LOBBY)
       });
+
+      // Below are added for formality of removing all listeners
+      AdMobInterstitial.addEventListener('interstitialDidOpen', () => {});
+      AdMobInterstitial.addEventListener('interstitialWillLeaveApplication', () => {});
+
     }
   }
 
@@ -71,9 +77,7 @@ class Create extends Component {
       isAdLoaded: false,
       bypassAd: false}) 
     if (Ads.showAds) {
-      AdMobInterstitial.removeEventListener('interstitialDidLoad');
-      AdMobInterstitial.removeEventListener('interstitialDidFailToLoad');
-      AdMobInterstitial.removeEventListener('interstitialDidClose');
+      AdMobInterstitial.removeAllListeners();
     }   
   }
 

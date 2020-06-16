@@ -32,6 +32,7 @@ class Join extends Component {
   }
 
   async componentDidMount() {
+    console.log('On join page')
     this.db = Fire.db;
     if (Ads.showAds) {
       AdMobInterstitial.setAdUnitID(Ads.JoinGameAlt.id.ios);
@@ -52,6 +53,10 @@ class Join extends Component {
         console.log('Join Game Ad Closed')
         this.props.changeScreen(Screens.LOBBY);
       });
+
+      // Below are added for formality of removing all listeners
+      AdMobInterstitial.addEventListener('interstitialDidOpen', () => {});
+      AdMobInterstitial.addEventListener('interstitialWillLeaveApplication', () => {});
     }
   }
 
@@ -63,9 +68,7 @@ class Join extends Component {
       bypassAd: false
     })
     if (Ads.showAds) {
-      AdMobInterstitial.removeEventListener('interstitialDidLoad');
-      AdMobInterstitial.removeEventListener('interstitialDidFailToLoad');
-      AdMobInterstitial.removeEventListener('interstitialDidClose');
+      AdMobInterstitial.removeAllListeners();
     }   
   }
 
