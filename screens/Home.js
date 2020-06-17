@@ -129,6 +129,7 @@ export default function Home(props) {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: Dimensions.get('screen').height/40,
+      marginTop: 3,
     },
     feedbackButton: {
       flex: 1,

@@ -32,14 +32,15 @@ class Join extends Component {
   }
 
   async componentDidMount() {
-    console.log('On join page')
     this.db = Fire.db;
     if (Ads.showAds) {
       AdMobInterstitial.setAdUnitID(Ads.JoinGameAlt.id.ios);
       if (await AdMobInterstitial.getIsReadyAsync()) {
         this.setState({isAdLoaded: true})
       } else {
-        AdMobInterstitial.requestAdAsync();
+        AdMobInterstitial.requestAdAsync()
+        .then(() => {})
+        .catch(() => console.log('Ad is already loaded'));
       }
       AdMobInterstitial.addEventListener('interstitialDidLoad', () => {
         console.log('Join Game Ad Loaded')

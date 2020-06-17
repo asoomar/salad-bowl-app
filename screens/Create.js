@@ -38,14 +38,15 @@ class Create extends Component {
   }
 
   async componentDidMount() {
-    console.log('On create page')
     this.db = Fire.db;
     AdMobInterstitial.setAdUnitID(Ads.CreateGameAlt.id.ios);
     if (Ads.showAds) {
       if (await AdMobInterstitial.getIsReadyAsync()) {
         this.setState({isAdLoaded: true})
       } else {
-        AdMobInterstitial.requestAdAsync();
+        AdMobInterstitial.requestAdAsync()
+        .then(() => {})
+        .catch(() => console.log('Ad is already loaded'));
       }
       AdMobInterstitial.addEventListener('interstitialDidLoad', () => {
         console.log('Create Game Ad Loaded')
