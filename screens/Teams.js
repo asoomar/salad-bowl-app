@@ -6,6 +6,7 @@ import Screens from '../constants/Screens';
 import Events from '../constants/Events';
 import Fire from '../Fire';
 import { isValidSnapshot } from '../global/GlobalFunctions';
+import { errorContent } from '../constants/Content';
 
 class Teams extends Component {
   state = {
@@ -29,8 +30,7 @@ class Teams extends Component {
     // Get player list to see the teams
     this.db.getRef(`players/${this.props.gameID}`).on('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 2)) {
-        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
-          "ended your game! \n(Error #2)")
+        this.props.setHomeMessage(errorContent(2))
         this.props.changeScreen(Screens.HOME);
         return
       }
@@ -56,8 +56,7 @@ class Teams extends Component {
     //Listen for Host change
     this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 3)) {
-        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
-          "ended your game! \n(Error #3)")
+        this.props.setHomeMessage(errorContent(3))
         this.props.changeScreen(Screens.HOME);
         return
       }

@@ -6,9 +6,11 @@ import Fire from '../Fire';
 import PrimaryButton from '../components/primitives/PrimaryButton';
 import LoadingPage from '../components/primitives/LoadingPage';
 import { isValidSnapshot} from '../global/GlobalFunctions';
-import { giveFeedbackContent } from '../constants/Content';
+import { giveFeedbackContent, errorContent } from '../constants/Content';
+import { messageValue } from '../constants/FirestoreValues';
 import { AdMobInterstitial } from 'expo-ads-admob';
 import Ads from '../constants/Ads';
+import { reduce } from 'lodash';
 
 class Finish extends Component {
   state = {
@@ -23,8 +25,7 @@ class Finish extends Component {
 
     this.db.getRef(`games/${this.props.gameID}/score`).once('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 9)) {
-        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
-          "ended your game! \n(Error #9)")
+        this.props.setHomeMessage(errorContent(9))
         this.props.changeScreen(Screens.HOME);
         return
       }
@@ -125,7 +126,20 @@ class Finish extends Component {
     if (false) {
       AdMobInterstitial.showAdAsync()
     } else {
-      this.props.setHomeMessage(giveFeedbackContent);
+      const ref = this.db.getCollection(messageValue).doc('gameFinish')
+      const snapshot = await ref.get()
+      const data = snapshot.data()
+      console.log(data)
+      if (data.promotion && data.promotion.enable) {
+        this.props.setHomeMessage({
+          title: data.promotion.title,
+          content: data.promotion.message,
+          askEmail: data.promotion.askEmail,
+          id: data.promotion.promotionId
+        });
+      } else {
+        this.props.setHomeMessage(giveFeedbackContent);
+      }
       this.props.changeScreen(Screens.HOME);
     }
   }

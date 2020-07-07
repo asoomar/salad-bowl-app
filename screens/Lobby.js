@@ -11,6 +11,7 @@ import { isValidSnapshot, getCurrentTimestamp } from '../global/GlobalFunctions'
 import { gameStorageValue } from '../constants/FirestoreValues';
 import Events from '../constants/Events';
 import { DEV } from '../constants/Mode';
+import { errorContent, hostLeftContent } from '../constants/Content';
 import Fire from '../Fire';
 import _ from 'lodash';
 import Ads from '../constants/Ads';
@@ -78,14 +79,13 @@ class Lobby extends Component {
     //Listen for Host change
     this.db.getRef(`games/${this.props.gameID}/host`).on('value', (snapshot) => {
       if (!isValidSnapshot(snapshot, 0)) {
-        this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
-        "ended your game! \n(Error #0)")
+        this.props.setHomeMessage(errorContent(0))
         this.props.changeScreen(Screens.HOME);
         return
       }
       if (snapshot.val() === "") {
         if (!this.state.wasHost) {
-          this.props.setHomeMessage("The game ended because the host left");
+          this.props.setHomeMessage(hostLeftContent);
           this.goHome();
         }
       } else {
@@ -302,8 +302,7 @@ class Lobby extends Component {
       console.log(`Setting up teams for game ${this.props.gameID}`);
       this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
         if (!isValidSnapshot(snapshot, 1)) {
-          this.props.setHomeMessage("We messed up! Sorry, we accidentally did something that " + 
-          "ended your game! \n(Error #1)")
+          this.props.setHomeMessage(errorContent(1))
           this.props.changeScreen(Screens.HOME);
           return
         }

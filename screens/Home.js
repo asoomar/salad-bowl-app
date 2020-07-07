@@ -16,7 +16,8 @@ export default function Home(props) {
   props.updateGameID('');
   props.updateTeam(-1);
 
-  const isFeedbackMessage = props.homeMessage === giveFeedbackContent;
+  const isFeedbackMessage = props.homeMessage && 
+    props.homeMessage.content === giveFeedbackContent.content;
   return (
     <View style={styles.container}>
       <PrimaryModal 
@@ -28,14 +29,15 @@ export default function Home(props) {
         }}
         onCancel={isFeedbackMessage ? () => props.setHomeMessage(null) : undefined}
         modalVisible={!!props.homeMessage}
-        title={isFeedbackMessage ? "Give Us Feedback" : "Uh Oh!"}
+        title={props.homeMessage ? props.homeMessage.title : null}
         buttonText="Okay"
+        askEmail={props.homeMessage ? props.homeMessage.askEmail : null}
         twoButtons={isFeedbackMessage}
         secondaryButtonText={isFeedbackMessage ? "Later" : undefined}
         minHeight={Dimensions.get('screen').height/10}
         content={
           <Text style={styles.modalText}>
-            {props.homeMessage}
+            {props.homeMessage ? props.homeMessage.content : null}
           </Text>
         }
       />

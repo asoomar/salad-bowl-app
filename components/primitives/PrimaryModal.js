@@ -86,6 +86,7 @@ PrimaryModal.propTypes = {
   titleHeight: PropTypes.number,
   twoButtons: PropTypes.bool,
   onCancel: PropTypes.func,
+  askEmail: PropTypes.bool
 }
   
 const styles = StyleSheet.create({
