@@ -17,7 +17,10 @@ export default function Home(props) {
   props.updateTeam(-1);
 
   const isFeedbackMessage = props.homeMessage && 
-    props.homeMessage.content === giveFeedbackContent.content;
+    props.homeMessage.content === giveFeedbackContent.content
+
+  const shouldAskEmail = props.homeMessage && props.homeMessage.askEmail
+
   return (
     <View style={styles.container}>
       <PrimaryModal 
@@ -27,13 +30,15 @@ export default function Home(props) {
           } 
           props.setHomeMessage(null)
         }}
-        onCancel={isFeedbackMessage ? () => props.setHomeMessage(null) : undefined}
+        onCancel={isFeedbackMessage || shouldAskEmail ? () => props.setHomeMessage(null) : undefined}
         modalVisible={!!props.homeMessage}
         title={props.homeMessage ? props.homeMessage.title : null}
-        buttonText="Okay"
+        buttonText={shouldAskEmail ? "Submit" : "Okay"}
         askEmail={props.homeMessage ? props.homeMessage.askEmail : null}
-        twoButtons={isFeedbackMessage}
-        secondaryButtonText={isFeedbackMessage ? "Later" : undefined}
+        emailId={props.homeMessage ? props.homeMessage.id : null}
+        cornerClose={shouldAskEmail || isFeedbackMessage}
+        // twoButtons={isFeedbackMessage}
+        // secondaryButtonText={isFeedbackMessage ? "Later" : undefined}
         minHeight={Dimensions.get('screen').height/10}
         content={
           <Text style={styles.modalText}>

@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.11.0",
     "expo": "^37.0.0",
     "expo-ads-admob": "~8.1.0",
     "expo-firebase-analytics": "~2.1.1",

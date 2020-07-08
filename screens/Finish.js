@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import Screens from '../constants/Screens';
 import Events from '../constants/Events';
 import Fire from '../Fire';
@@ -111,6 +112,15 @@ class Finish extends Component {
     }); 
   }
 
+  async didSignUp(promotionId) {
+    try {
+      const value = await AsyncStorage.getItem(promotionId)
+      return value === "true"
+    } catch {
+      return false
+    }
+  }
+
   async goHome() {
     this.db.logEvent(Events.GO_HOME, {
       screen: 'finish',
@@ -129,8 +139,7 @@ class Finish extends Component {
       const ref = this.db.getCollection(messageValue).doc('gameFinish')
       const snapshot = await ref.get()
       const data = snapshot.data()
-      console.log(data)
-      if (data.promotion && data.promotion.enable) {
+      if (data.promotion && data.promotion.enable && !(await this.didSignUp(data.promotion.promotionId))) {
         this.props.setHomeMessage({
           title: data.promotion.title,
           content: data.promotion.message,

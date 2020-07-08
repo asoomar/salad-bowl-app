@@ -1,19 +1,59 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, Dimensions, Modal } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Modal, TouchableOpacity } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 import PrimaryButton from './PrimaryButton';
+import PrimaryTextInput from './PrimaryTextInput';
+import { validateEmail, getCurrentTimestamp } from '../../global/GlobalFunctions';
+import AsyncStorage from '@react-native-community/async-storage';
+import Fire from '../../Fire';
 import PropTypes from 'prop-types';
 
 class PrimaryModal extends Component {
   state = {
     fontSize: this.props.titleHeight 
       ? this.props.titleHeight 
-      : Dimensions.get('screen').height/20
-  } 
+      : Dimensions.get('screen').height/20,
+    email: "",
+    error: ""  
+  }
+
+  componentDidMount() {
+    this.db = Fire.db;
+    this.setState({
+      email: "",
+      error: ""
+    })
+  }
+  
+  pressSubmit() {
+    if (this.props.askEmail) {
+      if (!validateEmail(this.state.email)) {
+        this.setState({error: "Email is invalid"})
+      } else {
+        this.db.getCollection('emails').add({
+          email: this.state.email,
+          timeStamp: getCurrentTimestamp(),
+          purpose: this.props.emailId
+        }).then(async () => {
+          try {
+            await AsyncStorage.setItem(this.props.emailId, "true")
+          } catch {console.log('error saving promotion to storage')}
+        }).finally(() => this.props.onCloseModal())
+      }
+    } else {
+      this.props.onCloseModal()
+    }
+  }
 
   render() {
     const modalStyling = {}
     if (this.props.minHeight !== undefined)
       modalStyling.minHeight = this.props.minHeight 
+
+    const modalBodyStyling = {}
+    if (!this.props.cornerClose) {
+      modalBodyStyling.paddingTop = Dimensions.get('screen').width * 0.04
+    }
 
     return (
       <Modal
@@ -24,47 +64,73 @@ class PrimaryModal extends Component {
       > 
         <View style={styles.background}>
           <View style={[styles.modalBox, modalStyling]}>
-            <View style={styles.titleView}>
-              <Text 
-                style={[styles.title, {fontSize: this.state.fontSize}]} 
-                adjustsFontSizeToFit
-                numberOfLines={1}
-                onTextLayout={e => {
-                  const { lines } = e.nativeEvent;
-                  if (lines.length > 1) {
-                    this.setState({fontSize: this.state.fontSize - 1});
-                  }
-                }}
-              >
-                {this.props.title}
-              </Text>
-            </View>
-            <View style={styles.content}>
-              {this.props.content}
-            </View>
-            <View style={styles.buttonView}>
-              {this.props.twoButtons
-              ? <View style={styles.button}>
+            {this.props.cornerClose ? 
+              <View style={styles.xBoxView}>
+                <TouchableOpacity onPress={() => this.props.onCancel()}>
+                  <AntDesign
+                    name={`closecircle`}
+                    size={Dimensions.get('screen').height/30}
+                    color={'#ffffff'}
+                  />
+                </TouchableOpacity>
+              </View> 
+            : null}
+            <View style={[styles.modalBoxBody, modalBodyStyling]}>
+              <View style={styles.titleView}>
+                <Text 
+                  style={[styles.title, {fontSize: this.state.fontSize}]} 
+                  adjustsFontSizeToFit
+                  numberOfLines={1}
+                  onTextLayout={e => {
+                    const { lines } = e.nativeEvent;
+                    if (lines.length > 1) {
+                      this.setState({fontSize: this.state.fontSize - 1});
+                    }
+                  }}
+                >
+                  {this.props.title}
+                </Text>
+              </View>
+              <View style={styles.content}>
+                {this.props.content}
+              </View>
+              {this.props.askEmail ? 
+                <>
+                  <Text style={styles.error}>{this.state.error}</Text>
+                  <PrimaryTextInput 
+                    autoCorrect={false}
+                    marginBottom={10}
+                    onChangeText={text=>this.setState({email: text})}
+                    placeholder={'Email'}
+                    style={styles.emailInput}
+                    value={this.state.email}
+                  /> 
+                </>
+              : null}
+              <View style={styles.buttonView}>
+                {this.props.twoButtons
+                ? <View style={styles.button}>
+                    <PrimaryButton 
+                      buttonStyle={styles.buttonStyleSecondary}
+                      textStyle={styles.buttonTextSecondary}
+                      text={this.props.secondaryButtonText 
+                        ? this.props.secondaryButtonText : "Cancel"}
+                      onPress={() => this.props.onCancel()}
+                    />
+                  </View>
+                : null}
+                <View style={styles.button}>
                   <PrimaryButton 
-                    buttonStyle={styles.buttonStyleSecondary}
-                    textStyle={styles.buttonTextSecondary}
-                    text={this.props.secondaryButtonText 
-                      ? this.props.secondaryButtonText : "Cancel"}
-                    onPress={() => this.props.onCancel()}
+                    buttonStyle={this.props.twoButtons 
+                      ? styles.buttonStyleSecondary
+                      : {}}
+                    textStyle={this.props.twoButtons
+                      ? styles.buttonTextSecondary
+                      : {}}
+                    text={this.props.buttonText}
+                    onPress={() => this.pressSubmit()}
                   />
                 </View>
-              : null}
-              <View style={styles.button}>
-                <PrimaryButton 
-                  buttonStyle={this.props.twoButtons 
-                    ? styles.buttonStyleSecondary
-                    : {}}
-                  textStyle={this.props.twoButtons
-                    ? styles.buttonTextSecondary
-                    : {}}
-                  text={this.props.buttonText}
-                  onPress={() => this.props.onCloseModal()}
-                />
               </View>
             </View>
           </View>
@@ -86,7 +152,9 @@ PrimaryModal.propTypes = {
   titleHeight: PropTypes.number,
   twoButtons: PropTypes.bool,
   onCancel: PropTypes.func,
-  askEmail: PropTypes.bool
+  askEmail: PropTypes.bool,
+  emailId: PropTypes.string,
+  cornerClose: PropTypes.bool
 }
   
 const styles = StyleSheet.create({
@@ -119,7 +187,16 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     borderRadius: Dimensions.get('screen').width * 0.04,
-    padding: Dimensions.get('screen').width * 0.06
+  },
+  modalBoxBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: Dimensions.get('screen').width * 0.06,
+    paddingBottom: Dimensions.get('screen').width * 0.04,
+    paddingTop: 0,
+    minHeight: Dimensions.get('screen').height/10,
   },
   titleView: {
     width: '100%',
@@ -142,6 +219,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
   },
   buttonStyle: {
     maxWidth: '90%',
@@ -162,7 +240,36 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-  }
+  },
+  xBoxView: {
+    display: "flex",
+    alignItems: "flex-end",
+    minWidth: "100%",
+    maxWidth: "100%",
+    paddingTop: 8,
+    paddingRight: 8,
+  },
+  emailInput: {
+    height: Dimensions.get('screen').height/15,
+    fontSize: Dimensions.get('screen').height/45,
+    minWidth: '100%',
+    paddingLeft: Dimensions.get('screen').width/20,
+    paddingRight: Dimensions.get('screen').width/20,
+    marginBottom: Dimensions.get('screen').width/20,
+    textAlign: 'center'
+  },
+  errorBox: {
+    minHeight: Dimensions.get('screen').height/15,
+    maxHeight: Dimensions.get('screen').height/15,
+    minWidth: '85%',
+    maxWidth: '85%',
+  },
+  error: {
+    fontSize: Dimensions.get('screen').height/50,
+    fontFamily: 'poppins-semibold',
+    color: '#ff0000',
+    textAlign: 'center'
+  },
 });
 
 export default PrimaryModal;
