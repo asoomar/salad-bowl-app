@@ -114,6 +114,8 @@ class Finish extends Component {
 
   async didSignUp(promotionId) {
     try {
+      // Uncomment line below to reset async storage
+      // await AsyncStorage.clear()
       const value = await AsyncStorage.getItem(promotionId)
       return value === "true"
     } catch {

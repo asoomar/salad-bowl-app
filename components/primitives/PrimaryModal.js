@@ -4,6 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 import PrimaryButton from './PrimaryButton';
 import PrimaryTextInput from './PrimaryTextInput';
 import { validateEmail, getCurrentTimestamp } from '../../global/GlobalFunctions';
+import { CheckBox, ListItem, Body} from 'native-base'
 import AsyncStorage from '@react-native-community/async-storage';
 import Fire from '../../Fire';
 import PropTypes from 'prop-types';
@@ -14,14 +15,16 @@ class PrimaryModal extends Component {
       ? this.props.titleHeight 
       : Dimensions.get('screen').height/20,
     email: "",
-    error: ""  
+    error: "",
+    checkValue: false  
   }
 
   componentDidMount() {
     this.db = Fire.db;
     this.setState({
       email: "",
-      error: ""
+      error: "",
+      checkValue: false
     })
   }
   
@@ -29,6 +32,8 @@ class PrimaryModal extends Component {
     if (this.props.askEmail) {
       if (!validateEmail(this.state.email)) {
         this.setState({error: "Email is invalid"})
+      } else if (!this.state.checkValue) {
+        this.setState({error: "You must be at least 13 years old for this offer"})
       } else {
         this.db.getCollection('emails').add({
           email: this.state.email,
@@ -96,7 +101,6 @@ class PrimaryModal extends Component {
               </View>
               {this.props.askEmail ? 
                 <>
-                  <Text style={styles.error}>{this.state.error}</Text>
                   <PrimaryTextInput 
                     autoCorrect={false}
                     marginBottom={10}
@@ -105,6 +109,18 @@ class PrimaryModal extends Component {
                     style={styles.emailInput}
                     value={this.state.email}
                   /> 
+                  <View style={styles.checkboxContent}>
+                    <CheckBox
+                      color={this.state.checkValue ? '#1c18a8' : '#ffffffaa'}
+                      checked={this.state.checkValue}
+                      onPress={() => this.state.checkValue ? 
+                        this.setState({checkValue: false}) : this.setState({checkValue: true})}
+                    />
+                    <Text style={styles.checkboxText}>
+                      I am at least 13 years old
+                    </Text>
+                  </View>
+                  <Text style={styles.error}>{this.state.error}</Text>
                 </>
               : null}
               <View style={styles.buttonView}>
@@ -250,25 +266,32 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   emailInput: {
-    height: Dimensions.get('screen').height/15,
+    height: Dimensions.get('screen').height/18,
     fontSize: Dimensions.get('screen').height/45,
     minWidth: '100%',
     paddingLeft: Dimensions.get('screen').width/20,
     paddingRight: Dimensions.get('screen').width/20,
-    marginBottom: Dimensions.get('screen').width/20,
     textAlign: 'center'
-  },
-  errorBox: {
-    minHeight: Dimensions.get('screen').height/15,
-    maxHeight: Dimensions.get('screen').height/15,
-    minWidth: '85%',
-    maxWidth: '85%',
   },
   error: {
-    fontSize: Dimensions.get('screen').height/50,
-    fontFamily: 'poppins-semibold',
-    color: '#ff0000',
+    minHeight: Dimensions.get('screen').width/25,
+    fontSize: Dimensions.get('screen').height/60,
+    fontFamily: 'poppins-regular',
+    color: '#ff0000', 
     textAlign: 'center'
+  },
+  checkboxContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Dimensions.get('screen').width/30
+  },
+  checkboxText: {
+    flex: 1, 
+    fontSize: Dimensions.get('screen').height/60,
+    fontFamily: 'poppins-semibold',
+    color: '#ffffffaa',
+    marginLeft: 20,
   },
 });
 
