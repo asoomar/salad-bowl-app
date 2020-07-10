@@ -5,6 +5,8 @@ import PrimaryButton from '../components/primitives/PrimaryButton';
 import PrimaryModal from '../components/primitives/PrimaryModal';
 import InstructionsModal from '../components/segments/InstructionsModal';
 import { giveFeedbackContent } from '../constants/Content';
+import Ads from '../constants/Ads';
+import { DEV } from '../constants/Mode'
 import * as app from '../app.json';
 
 const isTitleImage = true
@@ -37,8 +39,6 @@ export default function Home(props) {
         askEmail={props.homeMessage ? props.homeMessage.askEmail : null}
         emailId={props.homeMessage ? props.homeMessage.id : null}
         cornerClose={shouldAskEmail || isFeedbackMessage}
-        // twoButtons={isFeedbackMessage}
-        // secondaryButtonText={isFeedbackMessage ? "Later" : undefined}
         minHeight={Dimensions.get('screen').height/10}
         content={
           <Text style={styles.modalText}>
@@ -56,7 +56,9 @@ export default function Home(props) {
           onPress={() => props.changeScreen(Screens.FEEDBACK)}> 
           <Text style={styles.feedbackText}>Give Feedback</Text>
         </TouchableOpacity>
-        <Text style={styles.versionText}>v{app.expo.version}</Text>
+        <Text style={styles.versionText}>
+        {DEV ? '~' : ''}v{app.expo.version}{Ads.showAds ? '' : '*'}
+        </Text>
       </View>
       <View style={styles.titleView}>
         {isTitleImage 

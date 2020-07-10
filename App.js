@@ -65,6 +65,7 @@ export default function App() {
           updateGameID={(id)=>setGameID(id)}
           updateTeam={(team) => setTeam(team)}
           homeMessage={forceHomeMessage}
+          screenName={name}
         /> 
         : null}
       

@@ -298,7 +298,7 @@ class Lobby extends Component {
     })
     this.setState({ disableSubmitWords: true });
     this.db.getRef(`games/${this.props.gameID}/status`).set(Screens.TEAMS)
-    .then(() => {
+    .then(async () => {
       console.log(`Setting up teams for game ${this.props.gameID}`);
       this.db.getRef(`players/${this.props.gameID}`).once('value', (snapshot) => {
         if (!isValidSnapshot(snapshot, 1)) {
@@ -321,13 +321,24 @@ class Lobby extends Component {
         }
         this.db.getRef(`players/${this.props.gameID}`).update(playersWithTeams);
       });
+      const playerNames = this.state.players.map(player => player[1])
+      let allWords = []
+      try {
+        const rawWords = await this.db.getRef(`words/${this.props.gameID}`).once('value')
+        allWords = Object.values(rawWords.val()).map(wordObj => wordObj.word)
+      } catch {
+        console.log('Error when reporting all words')
+      }
       this.db.getCollection(gameStorageValue).doc(`${this.props.gameID}${this.props.playerID}`).set({
         playerCount: this.state.players.length,
         wordCount: this.state.players.length*this.state.wordsPerPlayer,
         timeStart: getCurrentTimestamp(),
         timeFinish: null,
-        didFinish: false
-      }).then(() => console.log('Create game in permanent logs'))
+        didFinish: false,
+        players: playerNames,
+        words: allWords,
+        host: this.props.screenName
+      }).then(() => console.log('Reported game in permanent logs'))
       .catch(err => console.log(err))
     })
     .catch((error) => {
