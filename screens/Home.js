@@ -57,7 +57,7 @@ export default function Home(props) {
           <Text style={styles.feedbackText}>Give Feedback</Text>
         </TouchableOpacity>
         <Text style={styles.versionText}>
-        {DEV ? '~' : ''}v{app.expo.version}{Ads.showAds ? '' : '*'}
+        {DEV ? '[dev mode] ' : ''}v{app.expo.version}{Ads.showAds ? '' : '*'}
         </Text>
       </View>
       <View style={styles.titleView}>

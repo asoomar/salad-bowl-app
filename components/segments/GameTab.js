@@ -11,7 +11,7 @@ class GameTab extends Component {
           <Text style={styles.colored}>{` ${this.props.currentPlayer} `}</Text>
           {` from `} 
           <Text style={styles.colored}>{` ${this.props.currentTeam} `}</Text>
-          {` is currently playing!`} 
+          {` is playing!`} 
         </Text>
       </View>
     );

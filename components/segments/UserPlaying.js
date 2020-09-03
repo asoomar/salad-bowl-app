@@ -39,7 +39,7 @@ class UserPlaying extends Component {
                 {this.props.currentWord}
               </Text>
             : <Text style={styles.callToAction}>
-                Press Start once you are ready to begin the round!
+                It's your turn to play!
               </Text>
             }
         </View>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   callToAction: {
-    fontSize: Dimensions.get('screen').height/35,
+    fontSize: Dimensions.get('screen').height/30,
     fontFamily: 'poppins-semibold',
     color: '#000',
     textAlign: 'center'
